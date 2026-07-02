@@ -1,0 +1,5 @@
+{
+  "env": "local",
+  "port": 3000,
+  "serviceName": "fed-tht-label-check"
+}

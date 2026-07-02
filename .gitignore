@@ -1,0 +1,22 @@
+# Dependencies
+/node_modules
+
+# Build output
+/dist
+/coverage
+*.tsbuildinfo
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS / editor
+.DS_Store
+.idea
+.vscode
+
+# Runtime config
+# config/config.local.json is committed with harmless local defaults only.
+# If it ever needs to hold anything private, un-comment the line below and
+# keep the real secrets out of the repo (production secrets live in GCP).
+# config/config.local.json
