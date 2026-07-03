@@ -9,26 +9,26 @@
  * tests build it directly, with no file reading.
  */
 
-import { CanonicalField, DrinkType } from './reads';
+import { CanonicalField, DrinkType } from "./reads";
 
 /** Find-strategy: how a field is located and anchored. */
 export type FindStrategy =
-  | 'from_expected' // anchor to an application value (brand; name and address)
-  | 'fixed_text' // anchor to a known legal string (the warning)
-  | 'from_list' // anchor to a compiled list of allowed values (class/type designations)
-  | 'by_format' // find by distinctive shape (alcohol, net contents), presence only
-  | 'none'; // open-ended recognition, nothing to match against
+  | "from_expected" // anchor to an application value (brand; name and address)
+  | "fixed_text" // anchor to a known legal string (the warning)
+  | "from_list" // anchor to a compiled list of allowed values (class/type designations)
+  | "by_format" // find by distinctive shape (alcohol, net contents), presence only
+  | "none"; // open-ended recognition, nothing to match against
 
 /** How lenient an anchored comparison is. */
 export type MatchLeniency =
-  | 'lenient' // ignore case and punctuation (brand)
-  | 'loose'; // allow surrounding/wrapping words too (name and address)
+  | "lenient" // ignore case and punctuation (brand)
+  | "loose"; // allow surrounding/wrapping words too (name and address)
 
 /** The distinctive shape a by-format presence check looks for. */
-export type FormatKind = 'alcohol' | 'net-contents' | 'country-of-origin';
+export type FormatKind = "alcohol" | "net-contents" | "country-of-origin";
 
 /** Where the answer to a condition comes from. */
-export type ConditionSource = 'label' | 'application' | 'unavailable';
+export type ConditionSource = "label" | "application" | "unavailable";
 
 /** A flat, non-composing condition tag with a declared source for its answer. */
 export interface Condition {
@@ -59,14 +59,7 @@ export interface Designation {
 }
 
 /** The reason IDs a field can emit. Keys are outcomes; values are the ID strings. */
-export type ReasonKey =
-  | 'missing'
-  | 'wrong'
-  | 'caps'
-  | 'invalid'
-  | 'unconfirmed'
-  | 'unreadable'
-  | 'conflict';
+export type ReasonKey = "missing" | "wrong" | "caps" | "invalid" | "unconfirmed" | "unreadable" | "conflict";
 
 export interface FieldRule {
   /** Shape: the canonical field this rule is about. */

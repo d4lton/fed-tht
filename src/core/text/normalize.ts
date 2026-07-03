@@ -11,7 +11,7 @@ export function words(value: string): string[] {
 
 /** Canonical form: lowercase word tokens joined by single spaces. */
 export function normalizedText(value: string): string {
-  return words(value).join(' ');
+  return words(value).join(" ");
 }
 
 /**

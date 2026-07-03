@@ -87,3 +87,21 @@ The environment selects the runtime-config source via `NODE_ENV`:
 `config/config.test.json`, `production` reads from GCP Secret Manager
 (currently a clearly-marked stub in `src/config/loaders/gcp.loader.ts`).
 The pure compliance core lives under `src/core/` and must not import NestJS.
+
+## The label reader
+
+The reader is the one part that talks to the outside world; it fills a swappable
+slot (`LabelReader` in `src/reader/`). The stand-in (`StandInReader`) returns
+pre-set reads for fast, free tests. The real reader (`ClaudeLabelReader`) reads
+an actual image by asking Claude through **Vercel's AI SDK** (`ai` +
+`@ai-sdk/anthropic`), constrained to the fixed label-report shape via
+`generateObject` — a reply that doesn't fit fails plainly. Provider and model
+(Haiku) are config choices; the API key comes from config, supplied in dev via
+`ANTHROPIC_API_KEY` (kept out of the repo — `config.local.json` holds an empty
+default). The AI SDK is a deliberate design choice for provider-swappability and
+fixed-shape output — do not swap it for the raw Anthropic SDK.
+
+The costly "reading tests" that actually call the model are gated: they run only
+when `ANTHROPIC_API_KEY` is set (`ANTHROPIC_API_KEY=sk-... npm test`); otherwise
+they skip. The bulk of coverage is the cheap hand-written-report tests that never
+call the model.

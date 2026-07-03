@@ -1,5 +1,5 @@
-import { FixedText } from '../types';
-import { normalizedText } from '../text/normalize';
+import { FixedText } from "../types";
+import { normalizedText } from "../text/normalize";
 
 /**
  * The three ways a read of the government warning can land:
@@ -13,16 +13,16 @@ import { normalizedText } from '../text/normalize';
  * still insisting the capsWords appear in capitals. Collapsing that distinction
  * produces false rejections.
  */
-export type WarningVerdict = 'ok' | 'wrong-words' | 'bad-caps';
+export type WarningVerdict = "ok" | "wrong-words" | "bad-caps";
 
 export function checkWarning(read: string, fixed: FixedText): WarningVerdict {
   if (normalizedText(read) !== normalizedText(fixed.text)) {
-    return 'wrong-words';
+    return "wrong-words";
   }
   for (const capsWord of fixed.capsWords) {
     if (!read.includes(capsWord)) {
-      return 'bad-caps';
+      return "bad-caps";
     }
   }
-  return 'ok';
+  return "ok";
 }

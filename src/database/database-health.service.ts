@@ -1,6 +1,6 @@
-import { Inject, Injectable } from '@nestjs/common';
-import { Pool } from 'pg';
-import { PG_POOL } from './database.constants';
+import { Inject, Injectable } from "@nestjs/common";
+import { Pool } from "pg";
+import { PG_POOL } from "./database.constants";
 
 export interface DatabaseHealth {
   reachable: boolean;
@@ -22,7 +22,7 @@ export class DatabaseHealthService {
     try {
       const client = await this.pool.connect();
       try {
-        await client.query('SELECT 1');
+        await client.query("SELECT 1");
       } finally {
         client.release();
       }
@@ -40,7 +40,7 @@ export class DatabaseHealthService {
  */
 function describeError(error: unknown): string {
   if (error instanceof AggregateError && error.errors.length > 0) {
-    return error.errors.map((e) => describeError(e)).join('; ');
+    return error.errors.map((e) => describeError(e)).join("; ");
   }
   if (error instanceof Error) {
     return error.message || error.name;

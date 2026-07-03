@@ -14,7 +14,7 @@
 export function loadGcpConfig(): unknown {
   // TODO(phase-later): replace with a real Secret Manager fetch.
   return {
-    env: 'production',
+    env: "production",
     port: process.env.PORT ? Number(process.env.PORT) : undefined,
     serviceName: process.env.SERVICE_NAME,
     database: {
@@ -22,7 +22,13 @@ export function loadGcpConfig(): unknown {
       port: process.env.DB_PORT ? Number(process.env.DB_PORT) : undefined,
       name: process.env.DB_NAME,
       user: process.env.DB_USER,
-      password: process.env.DB_PASSWORD,
+      password: process.env.DB_PASSWORD
     },
+    reader: {
+      provider: "anthropic",
+      model: process.env.READER_MODEL ?? "claude-haiku-4-5",
+      apiKey: process.env.ANTHROPIC_API_KEY,
+      timeoutMs: process.env.READER_TIMEOUT_MS ? Number(process.env.READER_TIMEOUT_MS) : 5000
+    }
   };
 }

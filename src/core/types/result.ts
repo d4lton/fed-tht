@@ -7,7 +7,7 @@
  * readable text is the display side's job, not the core's.
  */
 
-export type Outcome = 'pass' | 'fail';
+export type Outcome = "pass" | "fail";
 
 /** The value one label showed, used when labels disagree. */
 export interface ConflictValue {

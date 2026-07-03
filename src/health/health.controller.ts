@@ -1,12 +1,9 @@
-import { Controller, Get } from '@nestjs/common';
-import { AppConfigService } from '../config/app-config.service';
-import {
-  DatabaseHealth,
-  DatabaseHealthService,
-} from '../database/database-health.service';
+import { Controller, Get } from "@nestjs/common";
+import { AppConfigService } from "../config/app-config.service";
+import { DatabaseHealth, DatabaseHealthService } from "../database/database-health.service";
 
 export interface HealthResponse {
-  status: 'ok';
+  status: "ok";
   service: string;
   env: string;
   /** Whether the app can currently reach the database. */
@@ -19,20 +16,20 @@ export interface HealthResponse {
  * database reachability is reported separately so it can be false without
  * claiming the process itself is down.
  */
-@Controller('health')
+@Controller("health")
 export class HealthController {
   constructor(
     private readonly config: AppConfigService,
-    private readonly databaseHealth: DatabaseHealthService,
+    private readonly databaseHealth: DatabaseHealthService
   ) {}
 
   @Get()
   async check(): Promise<HealthResponse> {
     return {
-      status: 'ok',
+      status: "ok",
       service: this.config.serviceName,
       env: this.config.env,
-      database: await this.databaseHealth.check(),
+      database: await this.databaseHealth.check()
     };
   }
 }

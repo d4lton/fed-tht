@@ -1,4 +1,4 @@
-import { Designation, DrinkType, FixedText, LabelReadingReport } from '../core';
+import { Designation, DrinkType, FixedText, LabelReadingReport } from "../core";
 
 /**
  * The reader slot — the shape any label reader must have. The reader is the one
@@ -15,11 +15,7 @@ export interface LabelReader {
    * Async because a real reader (a model) will be; the stand-in resolves
    * immediately. Called once per image.
    */
-  read(
-    image: LabelImage,
-    type: DrinkType,
-    lookFor: ThingsToLookFor,
-  ): Promise<LabelReadingReport>;
+  read(image: LabelImage, type: DrinkType, lookFor: ThingsToLookFor): Promise<LabelReadingReport>;
 }
 
 /** One label image handed to the reader. */

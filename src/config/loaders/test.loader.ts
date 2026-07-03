@@ -1,5 +1,5 @@
-import { readFileSync } from 'fs';
-import { join } from 'path';
+import { readFileSync } from "fs";
+import { join } from "path";
 
 /**
  * Test config source: reads `config/config.test.json` from the project root.
@@ -7,6 +7,6 @@ import { join } from 'path';
  * load-and-validate path the other environments use is exercised under test.
  */
 export function loadTestConfig(): unknown {
-  const path = join(process.cwd(), 'config', 'config.test.json');
-  return JSON.parse(readFileSync(path, 'utf8')) as unknown;
+  const path = join(process.cwd(), "config", "config.test.json");
+  return JSON.parse(readFileSync(path, "utf8")) as unknown;
 }

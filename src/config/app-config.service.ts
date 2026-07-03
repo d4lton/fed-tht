@@ -1,7 +1,7 @@
-import { Injectable } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import { AppConfig, DatabaseConfig } from './config.schema';
-import { APP_CONFIG_NAMESPACE } from './configuration';
+import { Injectable } from "@nestjs/common";
+import { ConfigService } from "@nestjs/config";
+import { AppConfig, DatabaseConfig, ReaderConfig } from "./config.schema";
+import { APP_CONFIG_NAMESPACE } from "./configuration";
 
 /**
  * The one way the rest of the app reads runtime settings. It hides where the
@@ -17,7 +17,7 @@ export class AppConfigService {
     return this.config.getOrThrow<AppConfig>(APP_CONFIG_NAMESPACE);
   }
 
-  get env(): AppConfig['env'] {
+  get env(): AppConfig["env"] {
     return this.app.env;
   }
 
@@ -31,5 +31,9 @@ export class AppConfigService {
 
   get database(): DatabaseConfig {
     return this.app.database;
+  }
+
+  get reader(): ReaderConfig {
+    return this.app.reader;
   }
 }

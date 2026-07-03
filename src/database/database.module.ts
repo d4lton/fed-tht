@@ -1,8 +1,8 @@
-import { Inject, Module, OnModuleDestroy } from '@nestjs/common';
-import { Pool } from 'pg';
-import { AppConfigService } from '../config/app-config.service';
-import { DatabaseHealthService } from './database-health.service';
-import { PG_POOL } from './database.constants';
+import { Inject, Module, OnModuleDestroy } from "@nestjs/common";
+import { Pool } from "pg";
+import { AppConfigService } from "../config/app-config.service";
+import { DatabaseHealthService } from "./database-health.service";
+import { PG_POOL } from "./database.constants";
 
 /**
  * Owns the Postgres connection at the outer edge of the app. The pure core
@@ -29,13 +29,13 @@ import { PG_POOL } from './database.constants';
           max: 4,
           // Keep the health check snappy when the database is unreachable.
           connectionTimeoutMillis: 1000,
-          idleTimeoutMillis: 10000,
+          idleTimeoutMillis: 10000
         });
-      },
+      }
     },
-    DatabaseHealthService,
+    DatabaseHealthService
   ],
-  exports: [DatabaseHealthService],
+  exports: [DatabaseHealthService]
 })
 export class DatabaseModule implements OnModuleDestroy {
   constructor(@Inject(PG_POOL) private readonly pool: Pool) {}

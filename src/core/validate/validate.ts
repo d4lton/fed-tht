@@ -1,20 +1,8 @@
-import {
-  AggregatedField,
-  AggregatedInfo,
-  FieldObservation,
-} from '../aggregate/aggregate';
-import { matchesDesignation } from '../designations/match';
-import { containsPhrase, normalizedText } from '../text/normalize';
-import { checkWarning } from '../warning/warning';
-import {
-  Condition,
-  ExpectedValues,
-  FieldRule,
-  Outcome,
-  Reason,
-  RulesForType,
-  ValidationResult,
-} from '../types';
+import { AggregatedField, AggregatedInfo, FieldObservation } from "../aggregate/aggregate";
+import { matchesDesignation } from "../designations/match";
+import { containsPhrase, normalizedText } from "../text/normalize";
+import { checkWarning } from "../warning/warning";
+import { Condition, ExpectedValues, FieldRule, Outcome, Reason, RulesForType, ValidationResult } from "../types";
 
 /**
  * Judge (pipeline step 4): the pure, deterministic compliance decision. Takes
@@ -34,30 +22,23 @@ export interface JudgeInput {
 export function judge(input: JudgeInput): ValidationResult {
   const { aggregated, expected, rules, application } = input;
   const reasons: Reason[] = [];
-
   for (const rule of rules.fields) {
     // A rule that doesn't apply to this product leaves no trace — not a pass,
     // not a fail, not a note.
     if (!isRequired(rule, expected)) {
       continue;
     }
-
     const agg = aggregated.byField[rule.field];
-
     // Labels agreeing: the same field showing different values on two labels is
     // a fail, regardless of whether any single value is otherwise correct.
     const conflict = detectConflict(rule, agg);
     if (conflict) {
       reasons.push(conflict);
     }
-
     reasons.push(...judgeField(rule, agg, expected));
   }
-
-  const outcome: Outcome = reasons.length > 0 ? 'fail' : 'pass';
-  return application !== undefined
-    ? { application, outcome, reasons }
-    : { outcome, reasons };
+  const outcome: Outcome = reasons.length > 0 ? "fail" : "pass";
+  return application !== undefined ? { application, outcome, reasons } : { outcome, reasons };
 }
 
 // --- obligation -----------------------------------------------------------
@@ -72,80 +53,61 @@ function isRequired(rule: FieldRule, expected: ExpectedValues): boolean {
   return holds ?? false;
 }
 
-function evalCondition(
-  condition: Condition,
-  expected: ExpectedValues,
-): boolean | undefined {
-  if (condition.source === 'application' && condition.tag === 'imported') {
-    return expected.importedOrDomestic === 'imported';
+function evalCondition(condition: Condition, expected: ExpectedValues): boolean | undefined {
+  if (condition.source === "application" && condition.tag === "imported") {
+    return expected.importedOrDomestic === "imported";
   }
   return undefined;
 }
 
 // --- conflict detection ---------------------------------------------------
 
-function detectConflict(
-  rule: FieldRule,
-  agg: AggregatedField | undefined,
-): Reason | undefined {
+function detectConflict(rule: FieldRule, agg: AggregatedField | undefined): Reason | undefined {
   const conflictId = rule.reasons.conflict;
   if (!conflictId || !agg || agg.found.length < 2) {
     return undefined;
   }
-
   const groups: FieldObservation[][] = [];
   for (const observation of agg.found) {
-    const group = groups.find((g) =>
-      sameValue(rule, g[0].text ?? '', observation.text ?? ''),
-    );
+    const group = groups.find((g) => sameValue(rule, g[0].text ?? "", observation.text ?? ""));
     if (group) {
       group.push(observation);
     } else {
       groups.push([observation]);
     }
   }
-
   if (groups.length < 2) {
     return undefined;
   }
-
   return {
     id: conflictId,
     labels: agg.found.map((o) => o.label),
-    values: agg.found.map((o) => ({ label: o.label, value: o.text ?? '' })),
+    values: agg.found.map((o) => ({ label: o.label, value: o.text ?? "" }))
   };
 }
 
 /** Whether two found values count as "the same" for this field's leniency. */
 function sameValue(rule: FieldRule, a: string, b: string): boolean {
-  if (rule.match === 'loose') {
+  if (rule.match === "loose") {
     // One wrapping the other (e.g. "Bottled by X, City, ST" vs "X, City, ST")
     // is not a disagreement.
-    return (
-      normalizedText(a) === normalizedText(b) ||
-      containsPhrase(a, b) ||
-      containsPhrase(b, a)
-    );
+    return normalizedText(a) === normalizedText(b) || containsPhrase(a, b) || containsPhrase(b, a);
   }
   return normalizedText(a) === normalizedText(b);
 }
 
 // --- per-field judging ----------------------------------------------------
 
-function judgeField(
-  rule: FieldRule,
-  agg: AggregatedField | undefined,
-  expected: ExpectedValues,
-): Reason[] {
+function judgeField(rule: FieldRule, agg: AggregatedField | undefined, expected: ExpectedValues): Reason[] {
   switch (rule.find) {
-    case 'from_expected':
+    case "from_expected":
       return judgeFromExpected(rule, agg, expected);
-    case 'fixed_text':
+    case "fixed_text":
       return judgeFixedText(rule, agg);
-    case 'from_list':
+    case "from_list":
       return judgeFromList(rule, agg);
-    case 'by_format':
-    case 'none':
+    case "by_format":
+    case "none":
       return judgePresence(rule, agg);
   }
 }
@@ -163,10 +125,7 @@ function labelsOf(observations: FieldObservation[]): string[] {
  * unreadable spot (and the rule names an `unreadable` reason), say so pointing
  * at that label; otherwise it is simply missing (not tied to any one label).
  */
-function absenceReason(
-  rule: FieldRule,
-  agg: AggregatedField | undefined,
-): Reason {
+function absenceReason(rule: FieldRule, agg: AggregatedField | undefined): Reason {
   const unreadableLabels = agg?.unreadableLabels ?? [];
   if (unreadableLabels.length > 0 && rule.reasons.unreadable) {
     return { id: rule.reasons.unreadable, labels: [...unreadableLabels] };
@@ -174,26 +133,16 @@ function absenceReason(
   return { id: rule.reasons.missing ?? `${rule.field}-missing`, labels: [] };
 }
 
-function judgeFromExpected(
-  rule: FieldRule,
-  agg: AggregatedField | undefined,
-  expected: ExpectedValues,
-): Reason[] {
+function judgeFromExpected(rule: FieldRule, agg: AggregatedField | undefined, expected: ExpectedValues): Reason[] {
   const found = foundOf(agg);
   if (found.length === 0) {
     return [absenceReason(rule, agg)];
   }
-
-  const expectedValue =
-    rule.field === 'brand' ? expected.brand : expected.nameAndAddress;
-
-  const anyMatch = found.some((o) =>
-    matchesExpected(rule, o.text ?? '', expectedValue),
-  );
+  const expectedValue = rule.field === "brand" ? expected.brand : expected.nameAndAddress;
+  const anyMatch = found.some((o) => matchesExpected(rule, o.text ?? "", expectedValue));
   if (anyMatch) {
     return [];
   }
-
   const wrongId = rule.reasons.wrong;
   if (!wrongId) {
     return [];
@@ -203,57 +152,44 @@ function judgeFromExpected(
       id: wrongId,
       labels: labelsOf(found),
       expected: expectedValue,
-      found: found[0].text ?? '',
-    },
+      found: found[0].text ?? ""
+    }
   ];
 }
 
 /** Anchored comparison against an expected value. */
-function matchesExpected(
-  rule: FieldRule,
-  text: string,
-  expectedValue: string,
-): boolean {
-  if (rule.match === 'loose') {
+function matchesExpected(rule: FieldRule, text: string, expectedValue: string): boolean {
+  if (rule.match === "loose") {
     // The label wraps the producer in extra words; confirm it appears within.
-    return (
-      normalizedText(text) === normalizedText(expectedValue) ||
-      containsPhrase(text, expectedValue)
-    );
+    return normalizedText(text) === normalizedText(expectedValue) || containsPhrase(text, expectedValue);
   }
   // lenient: ignore case and punctuation.
   return normalizedText(text) === normalizedText(expectedValue);
 }
 
-function judgeFixedText(
-  rule: FieldRule,
-  agg: AggregatedField | undefined,
-): Reason[] {
+function judgeFixedText(rule: FieldRule, agg: AggregatedField | undefined): Reason[] {
   const found = foundOf(agg);
   if (found.length === 0) {
     return [absenceReason(rule, agg)];
   }
-
   const fixed = rule.fixedText;
   if (!fixed) {
     return [];
   }
-
   let sawWrongWords = false;
   let sawBadCaps = false;
   for (const observation of found) {
-    const verdict = checkWarning(observation.text ?? '', fixed);
-    if (verdict === 'ok') {
+    const verdict = checkWarning(observation.text ?? "", fixed);
+    if (verdict === "ok") {
       // The correct warning on any one label satisfies the requirement.
       return [];
     }
-    if (verdict === 'wrong-words') {
+    if (verdict === "wrong-words") {
       sawWrongWords = true;
     } else {
       sawBadCaps = true;
     }
   }
-
   if (sawWrongWords && rule.reasons.wrong) {
     return [{ id: rule.reasons.wrong, labels: labelsOf(found) }];
   }
@@ -263,34 +199,28 @@ function judgeFixedText(
   return [];
 }
 
-function judgeFromList(
-  rule: FieldRule,
-  agg: AggregatedField | undefined,
-): Reason[] {
+function judgeFromList(rule: FieldRule, agg: AggregatedField | undefined): Reason[] {
   const found = foundOf(agg);
   if (found.length === 0) {
     return [absenceReason(rule, agg)];
   }
-
   const designations = rule.designations ?? [];
-
   // Valid if any found phrase contains a legal core term — the judge confirms
   // against the list itself rather than trusting the reader's basis flag.
-  if (found.some((o) => matchesDesignation(o.text ?? '', designations))) {
+  if (found.some((o) => matchesDesignation(o.text ?? "", designations))) {
     return [];
   }
-
   // Not a legal designation. A read the reader admits it could not anchor
   // (basis = guess) is a specialty free-form name → unconfirmed. A read
   // presented as a designation that still isn't legal → invalid.
-  const claimed = found.filter((o) => o.basis !== 'guess');
+  const claimed = found.filter((o) => o.basis !== "guess");
   if (claimed.length > 0 && rule.reasons.invalid) {
     return [
       {
         id: rule.reasons.invalid,
         labels: labelsOf(claimed),
-        found: claimed[0].text ?? '',
-      },
+        found: claimed[0].text ?? ""
+      }
     ];
   }
   if (rule.reasons.unconfirmed) {
@@ -298,18 +228,15 @@ function judgeFromList(
       {
         id: rule.reasons.unconfirmed,
         labels: labelsOf(found),
-        found: found[0].text ?? '',
-      },
+        found: found[0].text ?? ""
+      }
     ];
   }
   return [];
 }
 
 /** Presence-only: a properly-formed statement present on any label satisfies it. */
-function judgePresence(
-  rule: FieldRule,
-  agg: AggregatedField | undefined,
-): Reason[] {
+function judgePresence(rule: FieldRule, agg: AggregatedField | undefined): Reason[] {
   if (foundOf(agg).length > 0) {
     return [];
   }

@@ -1,4 +1,4 @@
-import { Basis, CanonicalField, LabelReadingReport } from '../types';
+import { Basis, CanonicalField, LabelReadingReport } from "../types";
 
 /**
  * Combine (pipeline step 3): merge the per-image reads into one view across all
@@ -39,7 +39,6 @@ export interface AggregatedInfo {
 export function aggregate(reports: LabelReadingReport[]): AggregatedInfo {
   const labels: string[] = [];
   const byField: Partial<Record<CanonicalField, AggregatedField>> = {};
-
   const ensure = (field: CanonicalField): AggregatedField => {
     let entry = byField[field];
     if (!entry) {
@@ -48,7 +47,6 @@ export function aggregate(reports: LabelReadingReport[]): AggregatedInfo {
     }
     return entry;
   };
-
   for (const report of reports) {
     if (!labels.includes(report.label)) {
       labels.push(report.label);
@@ -56,22 +54,21 @@ export function aggregate(reports: LabelReadingReport[]): AggregatedInfo {
     for (const read of report.fields) {
       const entry = ensure(read.field);
       switch (read.state) {
-        case 'found':
+        case "found":
           entry.found.push({
             label: report.label,
             text: read.text,
-            basis: read.basis,
+            basis: read.basis
           });
           break;
-        case 'unreadable':
+        case "unreadable":
           entry.unreadableLabels.push(report.label);
           break;
-        case 'absent':
+        case "absent":
           entry.absentLabels.push(report.label);
           break;
       }
     }
   }
-
   return { labels, byField };
 }

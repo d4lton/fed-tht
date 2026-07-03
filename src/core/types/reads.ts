@@ -9,23 +9,16 @@
  * record (wine / distilled spirits / malt beverage). Phase 2 implements the
  * distilled-spirits rules only.
  */
-export type DrinkType = 'wine' | 'distilled-spirits' | 'malt-beverage';
+export type DrinkType = "wine" | "distilled-spirits" | "malt-beverage";
 
 /**
  * The shared, canonical field vocabulary. All three rule facets and every read
  * key off these names so they cannot silently desynchronize.
  */
-export type CanonicalField =
-  | 'brand'
-  | 'name-and-address'
-  | 'warning'
-  | 'alcohol'
-  | 'net-contents'
-  | 'class-type'
-  | 'country-of-origin';
+export type CanonicalField = "brand" | "name-and-address" | "warning" | "alcohol" | "net-contents" | "class-type" | "country-of-origin";
 
 /** Three distinct states, kept separate end to end (never collapse unreadable into absent). */
-export type FieldState = 'found' | 'absent' | 'unreadable';
+export type FieldState = "found" | "absent" | "unreadable";
 
 /**
  * How the reader knows what it read: `confirmed` = it matched something known
@@ -34,7 +27,7 @@ export type FieldState = 'found' | 'absent' | 'unreadable';
  * `guess` = it recognized this on its own with nothing to check against (mainly
  * a specialty product's free-form designation).
  */
-export type Basis = 'confirmed' | 'guess';
+export type Basis = "confirmed" | "guess";
 
 /** One observation about one field on one label. */
 export interface FieldRead {

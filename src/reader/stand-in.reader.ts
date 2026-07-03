@@ -1,5 +1,5 @@
-import { LabelReadingReport } from '../core';
-import { LabelImage, LabelReader } from './label-reader';
+import { LabelReadingReport } from "../core";
+import { LabelImage, LabelReader } from "./label-reader";
 
 /**
  * A stand-in reader: instead of looking at an image, it returns pre-set reads it
@@ -24,11 +24,7 @@ export class StandInReader implements LabelReader {
   read(image: LabelImage): Promise<LabelReadingReport> {
     const report = this.reports.get(image.label);
     if (!report) {
-      return Promise.reject(
-        new Error(
-          `stand-in reader has no pre-set read for label "${image.label}"`,
-        ),
-      );
+      return Promise.reject(new Error(`stand-in reader has no pre-set read for label "${image.label}"`));
     }
     return Promise.resolve(report);
   }

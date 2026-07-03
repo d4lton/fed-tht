@@ -1,77 +1,67 @@
-import { DrinkType, ExpectedValues, LabelReadingReport } from '../core';
-import {
-  GOVERNMENT_WARNING_TEXT,
-  makeSpiritsRules,
-} from '../core/validate/__fixtures__/spirits-rules.fixture';
-import {
-  LabelImage,
-  LabelReader,
-  StandInReader,
-  ThingsToLookFor,
-} from '../reader';
-import { thingsToLookFor, verifyLabels } from './verify';
+import { DrinkType, ExpectedValues, LabelReadingReport } from "../core";
+import { GOVERNMENT_WARNING_TEXT, makeSpiritsRules } from "../core/validate/__fixtures__/spirits-rules.fixture";
+import { LabelImage, LabelReader, StandInReader, ThingsToLookFor } from "../reader";
+import { thingsToLookFor, verifyLabels } from "./verify";
 
-const TYPE: DrinkType = 'distilled-spirits';
+const TYPE: DrinkType = "distilled-spirits";
 const RULES = makeSpiritsRules();
-
 const EXPECTED: ExpectedValues = {
-  brand: 'Old Tom Distillery',
-  nameAndAddress: 'Old Tom Distillery, Bardstown, KY',
-  importedOrDomestic: 'domestic',
+  brand: "Old Tom Distillery",
+  nameAndAddress: "Old Tom Distillery, Bardstown, KY",
+  importedOrDomestic: "domestic"
 };
-
-const IMAGES: LabelImage[] = [{ label: 'front' }, { label: 'back' }];
+const IMAGES: LabelImage[] = [{ label: "front" }, { label: "back" }];
 
 // --- scenario reads (hand-written, no images) -----------------------------
 
 function cleanBourbon(): LabelReadingReport[] {
   return [
     {
-      label: 'front',
+      label: "front",
       fields: [
         {
-          field: 'brand',
-          state: 'found',
-          text: 'Old Tom Distillery',
-          basis: 'confirmed',
+          field: "brand",
+          state: "found",
+          text: "Old Tom Distillery",
+          basis: "confirmed"
         },
         {
-          field: 'name-and-address',
-          state: 'found',
-          text: 'Bottled by Old Tom Distillery, Bardstown, KY',
-          basis: 'confirmed',
+          field: "name-and-address",
+          state: "found",
+          text: "Bottled by Old Tom Distillery, Bardstown, KY",
+          basis: "confirmed"
         },
         {
-          field: 'alcohol',
-          state: 'found',
-          text: '45% Alc./Vol. (90 Proof)',
-          basis: 'confirmed',
+          field: "alcohol",
+          state: "found",
+          text: "45% Alc./Vol. (90 Proof)",
+          basis: "confirmed"
         },
         {
-          field: 'net-contents',
-          state: 'found',
-          text: '750 mL',
-          basis: 'confirmed',
+          field: "net-contents",
+          state: "found",
+          text: "750 mL",
+          basis: "confirmed"
         },
         {
-          field: 'class-type',
-          state: 'found',
-          text: 'Kentucky Straight Bourbon Whiskey',
-          basis: 'confirmed',
-        },
-      ],
+          field: "class-type",
+          state: "found",
+          text: "Kentucky Straight Bourbon Whiskey",
+          basis: "confirmed"
+        }
+      ]
     },
     {
-      label: 'back',
+      label: "back",
       fields: [
         {
-          field: 'warning',
-          state: 'found',
+          field: "warning",
+          state: "found",
           text: GOVERNMENT_WARNING_TEXT,
-          basis: 'confirmed',
-        },
-      ],
-    },
+          basis: "confirmed"
+        }
+      ]
+    }
   ];
 }
 
@@ -82,52 +72,52 @@ function cleanBourbon(): LabelReadingReport[] {
 function mangledBourbon(): LabelReadingReport[] {
   return [
     {
-      label: 'front',
+      label: "front",
       fields: [
         {
-          field: 'brand',
-          state: 'found',
-          text: 'Definitely Not Old Tom',
-          basis: 'confirmed',
+          field: "brand",
+          state: "found",
+          text: "Definitely Not Old Tom",
+          basis: "confirmed"
         },
         {
-          field: 'name-and-address',
-          state: 'found',
-          text: 'Bottled by Old Tom Distillery, Bardstown, KY',
-          basis: 'confirmed',
+          field: "name-and-address",
+          state: "found",
+          text: "Bottled by Old Tom Distillery, Bardstown, KY",
+          basis: "confirmed"
         },
         {
-          field: 'alcohol',
-          state: 'found',
-          text: '45% Alc./Vol. (90 Proof)',
-          basis: 'confirmed',
+          field: "alcohol",
+          state: "found",
+          text: "45% Alc./Vol. (90 Proof)",
+          basis: "confirmed"
         },
         {
-          field: 'net-contents',
-          state: 'found',
-          text: '750 mL',
-          basis: 'confirmed',
+          field: "net-contents",
+          state: "found",
+          text: "750 mL",
+          basis: "confirmed"
         },
         {
-          field: 'class-type',
-          state: 'found',
-          text: 'Kentucky Straight Bourbon Whiskey',
-          basis: 'confirmed',
-        },
-      ],
+          field: "class-type",
+          state: "found",
+          text: "Kentucky Straight Bourbon Whiskey",
+          basis: "confirmed"
+        }
+      ]
     },
     {
-      label: 'back',
+      label: "back",
       // Warning is absent everywhere; alcohol disagrees with the front.
       fields: [
         {
-          field: 'alcohol',
-          state: 'found',
-          text: '40% Alc./Vol. (80 Proof)',
-          basis: 'confirmed',
-        },
-      ],
-    },
+          field: "alcohol",
+          state: "found",
+          text: "40% Alc./Vol. (80 Proof)",
+          basis: "confirmed"
+        }
+      ]
+    }
   ];
 }
 
@@ -137,40 +127,34 @@ function run(reader: LabelReader) {
     type: TYPE,
     expected: EXPECTED,
     rules: RULES,
-    reader,
+    reader
   });
 }
 
 // --- the flow, end to end through the slot --------------------------------
 
-describe('verifyLabels — read → combine → judge through the reader slot', () => {
-  it('passes for a clean bourbon (front + back)', async () => {
+describe("verifyLabels — read → combine → judge through the reader slot", () => {
+  it("passes for a clean bourbon (front + back)", async () => {
     const result = await run(new StandInReader(cleanBourbon()));
-    expect(result.outcome).toBe('pass');
+    expect(result.outcome).toBe("pass");
     expect(result.reasons).toEqual([]);
   });
-
-  it('fails a mangled set, carrying the right reasons', async () => {
+  it("fails a mangled set, carrying the right reasons", async () => {
     const result = await run(new StandInReader(mangledBourbon()));
-    expect(result.outcome).toBe('fail');
-    expect(result.reasons.map((r) => r.id).sort()).toEqual(
-      ['alcohol-conflict', 'brand-wrong', 'warning-missing'].sort(),
-    );
+    expect(result.outcome).toBe("fail");
+    expect(result.reasons.map((r) => r.id).sort()).toEqual(["alcohol-conflict", "brand-wrong", "warning-missing"].sort());
   });
-
-  it('swapping the reader is all that changes', async () => {
+  it("swapping the reader is all that changes", async () => {
     // Same images/type/expected/rules; only the reader differs.
     const clean = await run(new StandInReader(cleanBourbon()));
     const mangled = await run(new StandInReader(mangledBourbon()));
-    expect(clean.outcome).toBe('pass');
-    expect(mangled.outcome).toBe('fail');
+    expect(clean.outcome).toBe("pass");
+    expect(mangled.outcome).toBe("fail");
   });
-
-  it('reads through the slot: once per image, handed the things to look for', async () => {
+  it("reads through the slot: once per image, handed the things to look for", async () => {
     const recorder = new RecordingReader(cleanBourbon());
     await run(recorder);
-
-    expect(recorder.calls.map((c) => c.image.label)).toEqual(['front', 'back']);
+    expect(recorder.calls.map((c) => c.image.label)).toEqual(["front", "back"]);
     for (const call of recorder.calls) {
       expect(call.type).toBe(TYPE);
       expect(call.lookFor.brand).toBe(EXPECTED.brand);
@@ -180,15 +164,12 @@ describe('verifyLabels — read → combine → judge through the reader slot', 
     }
   });
 });
-
-describe('thingsToLookFor', () => {
-  it('pulls the warning wording and designations from the rules', () => {
+describe("thingsToLookFor", () => {
+  it("pulls the warning wording and designations from the rules", () => {
     const lookFor = thingsToLookFor(EXPECTED, RULES);
     expect(lookFor.brand).toBe(EXPECTED.brand);
-    expect(lookFor.warning?.capsWords).toContain('GOVERNMENT WARNING');
-    expect(
-      lookFor.designations.some((d) => d.designation === 'Bourbon Whiskey'),
-    ).toBe(true);
+    expect(lookFor.warning?.capsWords).toContain("GOVERNMENT WARNING");
+    expect(lookFor.designations.some((d) => d.designation === "Bourbon Whiskey")).toBe(true);
   });
 });
 
@@ -205,11 +186,7 @@ class RecordingReader implements LabelReader {
     this.reports = new Map(reports.map((r) => [r.label, r]));
   }
 
-  read(
-    image: LabelImage,
-    type: DrinkType,
-    lookFor: ThingsToLookFor,
-  ): Promise<LabelReadingReport> {
+  read(image: LabelImage, type: DrinkType, lookFor: ThingsToLookFor): Promise<LabelReadingReport> {
     this.calls.push({ image, type, lookFor });
     const report = this.reports.get(image.label);
     if (!report) {

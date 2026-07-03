@@ -1,13 +1,13 @@
-import * as Joi from 'joi';
-import { AppConfig, configSchema } from './config.schema';
-import { loadGcpConfig } from './loaders/gcp.loader';
-import { loadLocalConfig } from './loaders/local.loader';
-import { loadTestConfig } from './loaders/test.loader';
+import * as Joi from "joi";
+import { AppConfig, configSchema } from "./config.schema";
+import { loadGcpConfig } from "./loaders/gcp.loader";
+import { loadLocalConfig } from "./loaders/local.loader";
+import { loadTestConfig } from "./loaders/test.loader";
 
-export type AppEnv = AppConfig['env'];
+export type AppEnv = AppConfig["env"];
 
 /** The config namespace the app reads through {@link AppConfigService}. */
-export const APP_CONFIG_NAMESPACE = 'app';
+export const APP_CONFIG_NAMESPACE = "app";
 
 /**
  * Decide which source to load from, from the environment. Anything that isn't
@@ -15,19 +15,19 @@ export const APP_CONFIG_NAMESPACE = 'app';
  */
 export function resolveEnv(): AppEnv {
   switch (process.env.NODE_ENV) {
-    case 'test':
-      return 'test';
-    case 'production':
-      return 'production';
+    case "test":
+      return "test";
+    case "production":
+      return "production";
     default:
-      return 'local';
+      return "local";
   }
 }
 
 const loaders: Record<AppEnv, () => unknown> = {
   local: loadLocalConfig,
   test: loadTestConfig,
-  production: loadGcpConfig,
+  production: loadGcpConfig
 };
 
 /**
@@ -42,17 +42,12 @@ const loaders: Record<AppEnv, () => unknown> = {
 export function loadConfiguration(): { [APP_CONFIG_NAMESPACE]: AppConfig } {
   const env = resolveEnv();
   const raw = loaders[env]();
-
   const result: Joi.ValidationResult<AppConfig> = configSchema.validate(raw, {
     abortEarly: false,
-    convert: true,
+    convert: true
   });
-
   if (result.error) {
-    throw new Error(
-      `Invalid runtime configuration for env "${env}": ${result.error.message}`,
-    );
+    throw new Error(`Invalid runtime configuration for env "${env}": ${result.error.message}`);
   }
-
   return { [APP_CONFIG_NAMESPACE]: result.value };
 }

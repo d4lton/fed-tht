@@ -5,7 +5,7 @@
  * (it is never looked for on the label). See the Application Record design page.
  */
 
-export type OriginStatus = 'imported' | 'domestic';
+export type OriginStatus = "imported" | "domestic";
 
 export interface ExpectedValues {
   brand: string;

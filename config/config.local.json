@@ -8,5 +8,11 @@
     "name": "fedtht_dev",
     "user": "fedtht",
     "password": "fedtht_dev_pw"
+  },
+  "reader": {
+    "provider": "anthropic",
+    "model": "claude-haiku-4-5",
+    "apiKey": "",
+    "timeoutMs": 5000
   }
 }
