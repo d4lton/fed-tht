@@ -1,4 +1,4 @@
-import { ImageStore, StoredImage } from "./image-store";
+import {ImageStore, StoredImage} from "./image-store";
 
 /**
  * The production image store: Google Cloud Storage.
@@ -9,6 +9,7 @@ import { ImageStore, StoredImage } from "./image-store";
  * place, so wiring this in later changes nothing above it.
  */
 export class GcsImageStore implements ImageStore {
+
   constructor(private readonly bucket: string) {}
 
   save(): Promise<string> {
@@ -22,4 +23,5 @@ export class GcsImageStore implements ImageStore {
   private notImplemented(): Error {
     return new Error(`GcsImageStore (bucket "${this.bucket}") is a placeholder; wire @google-cloud/storage for production`);
   }
+
 }

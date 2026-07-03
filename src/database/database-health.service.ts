@@ -1,6 +1,6 @@
-import { Inject, Injectable } from "@nestjs/common";
-import { Pool } from "pg";
-import { PG_POOL } from "./database.constants";
+import {Inject, Injectable} from "@nestjs/common";
+import {Pool} from "pg";
+import {PG_POOL} from "./database.constants";
 
 export interface DatabaseHealth {
   reachable: boolean;
@@ -16,6 +16,7 @@ export interface DatabaseHealth {
  */
 @Injectable()
 export class DatabaseHealthService {
+
   constructor(@Inject(PG_POOL) private readonly pool: Pool) {}
 
   async check(): Promise<DatabaseHealth> {
@@ -26,11 +27,12 @@ export class DatabaseHealthService {
       } finally {
         client.release();
       }
-      return { reachable: true };
+      return {reachable: true};
     } catch (error) {
-      return { reachable: false, error: describeError(error) };
+      return {reachable: false, error: describeError(error)};
     }
   }
+
 }
 
 /**
@@ -40,7 +42,7 @@ export class DatabaseHealthService {
  */
 function describeError(error: unknown): string {
   if (error instanceof AggregateError && error.errors.length > 0) {
-    return error.errors.map((e) => describeError(e)).join("; ");
+    return error.errors.map((inner) => describeError(inner)).join("; ");
   }
   if (error instanceof Error) {
     return error.message || error.name;

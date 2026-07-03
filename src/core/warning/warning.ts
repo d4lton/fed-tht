@@ -1,5 +1,5 @@
-import { FixedText } from "../types";
-import { normalizedText } from "../text/normalize";
+import {FixedText} from "../types";
+import {normalizedText} from "../text/normalize";
 
 /**
  * The three ways a read of the government warning can land:

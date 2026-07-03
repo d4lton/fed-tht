@@ -64,8 +64,7 @@ mode), TypeORM + Postgres for storage, Vercel's AI SDK for the label reader.
 - Run tests: `npm test` (unit) and `npm run test:e2e` (boots the app). The costly
   "reading tests" call the real model and run only when `ANTHROPIC_API_KEY` is
   set; otherwise they skip.
-- Lint: `npm run lint` (add `:fix` to auto-fix)
-- Format: `npm run format` (or `npm run format:check`)
+- Lint: `npm run lint` (add `:fix` to auto-fix; style is enforced by ESLint)
 - Whole app in Compose: `npm run app:up` builds the `Dockerfile` image and runs
   the app plus Postgres (`app:down` stops it, `app:logs` tails it).
 - Database only (coding loop): `npm run db:up` starts just Postgres (`db:down`

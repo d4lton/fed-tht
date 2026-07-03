@@ -1,8 +1,8 @@
 import * as Joi from "joi";
-import { AppConfig, configSchema } from "./config.schema";
-import { loadGcpConfig } from "./loaders/gcp.loader";
-import { loadLocalConfig } from "./loaders/local.loader";
-import { loadTestConfig } from "./loaders/test.loader";
+import {AppConfig, configSchema} from "./config.schema";
+import {loadGcpConfig} from "./loaders/gcp.loader";
+import {loadLocalConfig} from "./loaders/local.loader";
+import {loadTestConfig} from "./loaders/test.loader";
 
 export type AppEnv = AppConfig["env"];
 
@@ -49,5 +49,5 @@ export function loadConfiguration(): { [APP_CONFIG_NAMESPACE]: AppConfig } {
   if (result.error) {
     throw new Error(`Invalid runtime configuration for env "${env}": ${result.error.message}`);
   }
-  return { [APP_CONFIG_NAMESPACE]: result.value };
+  return {[APP_CONFIG_NAMESPACE]: result.value};
 }

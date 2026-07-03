@@ -1,5 +1,5 @@
-import { z } from "zod";
-import { LabelReadingReport } from "../core";
+import {z} from "zod";
+import {LabelReadingReport} from "../core";
 
 /**
  * The fixed shape the model must answer in — the label-report shape, enforced
@@ -25,7 +25,7 @@ export type RawLabelReport = z.infer<typeof labelReportSchema>;
 
 /** Attach the label id to the model's read to form the report the pipeline uses. */
 export function toLabelReadingReport(raw: RawLabelReport, label: string): LabelReadingReport {
-  const report: LabelReadingReport = { label, fields: raw.fields };
+  const report: LabelReadingReport = {label, fields: raw.fields};
   if (raw.notes) {
     report.notes = raw.notes;
   }

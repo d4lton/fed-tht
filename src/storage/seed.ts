@@ -1,6 +1,6 @@
-import { DrinkType, OriginStatus } from "../core";
-import { ApplicationStore } from "./application.store";
-import { ImageStore, StoredImage } from "./image-store/image-store";
+import {DrinkType, OriginStatus} from "../core";
+import {ApplicationStore} from "./application.store";
+import {ImageStore, StoredImage} from "./image-store/image-store";
 
 export interface SeedImage {
   /** front / back / neck. */

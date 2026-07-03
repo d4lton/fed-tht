@@ -1,5 +1,5 @@
-import { readFileSync } from "fs";
-import { join } from "path";
+import {readFileSync} from "fs";
+import {join} from "path";
 
 /**
  * Local-dev config source: reads `config/config.local.json` from the project

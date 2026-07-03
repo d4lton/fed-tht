@@ -1,4 +1,4 @@
-import { containsPhrase, equalsLenient, normalizedText, words } from "./normalize";
+import {containsPhrase, equalsLenient, normalizedText, words} from "./normalize";
 
 describe("words", () => {
   it("lowercases and drops punctuation", () => {

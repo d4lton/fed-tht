@@ -1,4 +1,4 @@
-import { Basis, CanonicalField, LabelReadingReport } from "../types";
+import {Basis, CanonicalField, LabelReadingReport} from "../types";
 
 /**
  * Combine (pipeline step 3): merge the per-image reads into one view across all
@@ -42,7 +42,7 @@ export function aggregate(reports: LabelReadingReport[]): AggregatedInfo {
   const ensure = (field: CanonicalField): AggregatedField => {
     let entry = byField[field];
     if (!entry) {
-      entry = { field, found: [], unreadableLabels: [], absentLabels: [] };
+      entry = {field, found: [], unreadableLabels: [], absentLabels: []};
       byField[field] = entry;
     }
     return entry;
@@ -70,5 +70,5 @@ export function aggregate(reports: LabelReadingReport[]): AggregatedInfo {
       }
     }
   }
-  return { labels, byField };
+  return {labels, byField};
 }

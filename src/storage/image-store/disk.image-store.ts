@@ -1,7 +1,7 @@
-import { randomUUID } from "crypto";
-import { mkdir, readFile, writeFile } from "fs/promises";
-import { basename, extname, join } from "path";
-import { ImageNotFoundError, ImageStore, StoredImage } from "./image-store";
+import {randomUUID} from "crypto";
+import {mkdir, readFile, writeFile} from "fs/promises";
+import {basename, extname, join} from "path";
+import {ImageNotFoundError, ImageStore, StoredImage} from "./image-store";
 
 const EXT_BY_MEDIA_TYPE: Record<string, string> = {
   "image/png": "png",
@@ -22,10 +22,11 @@ const MEDIA_TYPE_BY_EXT: Record<string, string> = {
  * reference is the file name. This is what runs in tests.
  */
 export class DiskImageStore implements ImageStore {
+
   constructor(private readonly dir: string) {}
 
   async save(image: StoredImage): Promise<string> {
-    await mkdir(this.dir, { recursive: true });
+    await mkdir(this.dir, {recursive: true});
     const ext = EXT_BY_MEDIA_TYPE[image.mediaType] ?? "bin";
     const ref = `${randomUUID()}.${ext}`;
     await writeFile(join(this.dir, ref), image.bytes);
@@ -52,6 +53,7 @@ export class DiskImageStore implements ImageStore {
       mediaType: MEDIA_TYPE_BY_EXT[ext] ?? "application/octet-stream"
     };
   }
+
 }
 
 function isNotFound(error: unknown): boolean {

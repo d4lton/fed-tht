@@ -21,15 +21,15 @@ export function normalizedText(value: string): string {
  * terms (a core term sitting inside a longer phrase).
  */
 export function containsPhrase(haystack: string, needle: string): boolean {
-  const h = words(haystack);
-  const n = words(needle);
-  if (n.length === 0 || n.length > h.length) {
+  const haystackWords = words(haystack);
+  const needleWords = words(needle);
+  if (needleWords.length === 0 || needleWords.length > haystackWords.length) {
     return false;
   }
-  for (let i = 0; i + n.length <= h.length; i++) {
+  for (let i = 0; i + needleWords.length <= haystackWords.length; i++) {
     let matched = true;
-    for (let j = 0; j < n.length; j++) {
-      if (h[i + j] !== n[j]) {
+    for (let j = 0; j < needleWords.length; j++) {
+      if (haystackWords[i + j] !== needleWords[j]) {
         matched = false;
         break;
       }

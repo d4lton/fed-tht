@@ -1,6 +1,6 @@
-import { Controller, Get } from "@nestjs/common";
-import { AppConfigService } from "../config/app-config.service";
-import { DatabaseHealth, DatabaseHealthService } from "../database/database-health.service";
+import {Controller, Get} from "@nestjs/common";
+import {AppConfigService} from "../config/app-config.service";
+import {DatabaseHealth, DatabaseHealthService} from "../database/database-health.service";
 
 export interface HealthResponse {
   status: "ok";
@@ -18,6 +18,7 @@ export interface HealthResponse {
  */
 @Controller("health")
 export class HealthController {
+
   constructor(
     private readonly config: AppConfigService,
     private readonly databaseHealth: DatabaseHealthService
@@ -32,4 +33,5 @@ export class HealthController {
       database: await this.databaseHealth.check()
     };
   }
+
 }

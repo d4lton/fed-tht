@@ -1,6 +1,6 @@
-import { aggregate, ExpectedValues, judge, LabelReadingReport } from "../core";
-import { GOVERNMENT_WARNING_TEXT } from "../core/validate/__fixtures__/spirits-rules.fixture";
-import { loadSpiritsRules } from "./rules-loader";
+import {aggregate, ExpectedValues, judge, LabelReadingReport} from "../core";
+import {GOVERNMENT_WARNING_TEXT} from "../core/validate/__fixtures__/spirits-rules.fixture";
+import {loadSpiritsRules} from "./rules-loader";
 
 /**
  * End-to-end through the real YAML rules: a hand-written bourbon (front + back
@@ -130,7 +130,7 @@ describe("a mangled bourbon", () => {
     ];
     const result = runScenario(reports);
     expect(result.outcome).toBe("fail");
-    const ids = result.reasons.map((r) => r.id).sort();
+    const ids = result.reasons.map((reason) => reason.id).sort();
     expect(ids).toEqual(["alcohol-missing", "brand-wrong", "class-type-invalid", "warning-wrong"].sort());
   });
 });

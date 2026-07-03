@@ -1,8 +1,8 @@
-import { Server } from "http";
-import { INestApplication } from "@nestjs/common";
-import { Test, TestingModule } from "@nestjs/testing";
+import {Server} from "http";
+import {INestApplication} from "@nestjs/common";
+import {Test, TestingModule} from "@nestjs/testing";
 import request from "supertest";
-import { AppModule } from "../src/app.module";
+import {AppModule} from "../src/app.module";
 
 describe("Health (e2e)", () => {
   let app: INestApplication;
@@ -23,7 +23,7 @@ describe("Health (e2e)", () => {
       status: string;
       database?: { reachable?: unknown };
     };
-    expect(body).toMatchObject({ status: "ok" });
+    expect(body).toMatchObject({status: "ok"});
     // Reachability is reported as a boolean either way; its value depends on
     // whether the Compose database happens to be up during the test run.
     expect(typeof body.database?.reachable).toBe("boolean");

@@ -1,4 +1,4 @@
-import { Designation, DrinkType, FixedText, LabelReadingReport } from "../core";
+import {Designation, DrinkType, FixedText, LabelReadingReport} from "../core";
 
 /**
  * The reader slot — the shape any label reader must have. The reader is the one
@@ -16,7 +16,13 @@ export interface LabelReader {
    * immediately. Called once per image.
    */
   read(image: LabelImage, type: DrinkType, lookFor: ThingsToLookFor): Promise<LabelReadingReport>;
+
+  /** Which model/reader produced the reads — recorded on the result's run facts. */
+  readonly model: string;
 }
+
+/** DI token for the configured {@link LabelReader}. */
+export const LABEL_READER = Symbol("LABEL_READER");
 
 /** One label image handed to the reader. */
 export interface LabelImage {

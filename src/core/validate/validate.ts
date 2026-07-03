@@ -1,8 +1,8 @@
-import { AggregatedField, AggregatedInfo, FieldObservation } from "../aggregate/aggregate";
-import { matchesDesignation } from "../designations/match";
-import { containsPhrase, normalizedText } from "../text/normalize";
-import { checkWarning } from "../warning/warning";
-import { Condition, ExpectedValues, FieldRule, Outcome, Reason, RulesForType, ValidationResult } from "../types";
+import {AggregatedField, AggregatedInfo, FieldObservation} from "../aggregate/aggregate";
+import {matchesDesignation} from "../designations/match";
+import {containsPhrase, normalizedText} from "../text/normalize";
+import {checkWarning} from "../warning/warning";
+import {Condition, ExpectedValues, FieldRule, Outcome, Reason, RulesForType, ValidationResult} from "../types";
 
 /**
  * Judge (pipeline step 4): the pure, deterministic compliance decision. Takes
@@ -20,7 +20,7 @@ export interface JudgeInput {
 }
 
 export function judge(input: JudgeInput): ValidationResult {
-  const { aggregated, expected, rules, application } = input;
+  const {aggregated, expected, rules, application} = input;
   const reasons: Reason[] = [];
   for (const rule of rules.fields) {
     // A rule that doesn't apply to this product leaves no trace — not a pass,
@@ -38,13 +38,13 @@ export function judge(input: JudgeInput): ValidationResult {
     reasons.push(...judgeField(rule, agg, expected));
   }
   const outcome: Outcome = reasons.length > 0 ? "fail" : "pass";
-  return application !== undefined ? { application, outcome, reasons } : { outcome, reasons };
+  return application !== undefined ? {application, outcome, reasons} : {outcome, reasons};
 }
 
 // --- obligation -----------------------------------------------------------
 
 function isRequired(rule: FieldRule, expected: ExpectedValues): boolean {
-  const { obligation } = rule;
+  const {obligation} = rule;
   if (!obligation.condition) {
     return obligation.required;
   }
@@ -69,7 +69,7 @@ function detectConflict(rule: FieldRule, agg: AggregatedField | undefined): Reas
   }
   const groups: FieldObservation[][] = [];
   for (const observation of agg.found) {
-    const group = groups.find((g) => sameValue(rule, g[0].text ?? "", observation.text ?? ""));
+    const group = groups.find((candidate) => sameValue(rule, candidate[0].text ?? "", observation.text ?? ""));
     if (group) {
       group.push(observation);
     } else {
@@ -81,8 +81,8 @@ function detectConflict(rule: FieldRule, agg: AggregatedField | undefined): Reas
   }
   return {
     id: conflictId,
-    labels: agg.found.map((o) => o.label),
-    values: agg.found.map((o) => ({ label: o.label, value: o.text ?? "" }))
+    labels: agg.found.map((observation) => observation.label),
+    values: agg.found.map((observation) => ({label: observation.label, value: observation.text ?? ""}))
   };
 }
 
@@ -117,7 +117,7 @@ function foundOf(agg: AggregatedField | undefined): FieldObservation[] {
 }
 
 function labelsOf(observations: FieldObservation[]): string[] {
-  return observations.map((o) => o.label);
+  return observations.map((observation) => observation.label);
 }
 
 /**
@@ -128,9 +128,9 @@ function labelsOf(observations: FieldObservation[]): string[] {
 function absenceReason(rule: FieldRule, agg: AggregatedField | undefined): Reason {
   const unreadableLabels = agg?.unreadableLabels ?? [];
   if (unreadableLabels.length > 0 && rule.reasons.unreadable) {
-    return { id: rule.reasons.unreadable, labels: [...unreadableLabels] };
+    return {id: rule.reasons.unreadable, labels: [...unreadableLabels]};
   }
-  return { id: rule.reasons.missing ?? `${rule.field}-missing`, labels: [] };
+  return {id: rule.reasons.missing ?? `${rule.field}-missing`, labels: []};
 }
 
 function judgeFromExpected(rule: FieldRule, agg: AggregatedField | undefined, expected: ExpectedValues): Reason[] {
@@ -139,7 +139,7 @@ function judgeFromExpected(rule: FieldRule, agg: AggregatedField | undefined, ex
     return [absenceReason(rule, agg)];
   }
   const expectedValue = rule.field === "brand" ? expected.brand : expected.nameAndAddress;
-  const anyMatch = found.some((o) => matchesExpected(rule, o.text ?? "", expectedValue));
+  const anyMatch = found.some((observation) => matchesExpected(rule, observation.text ?? "", expectedValue));
   if (anyMatch) {
     return [];
   }
@@ -191,10 +191,10 @@ function judgeFixedText(rule: FieldRule, agg: AggregatedField | undefined): Reas
     }
   }
   if (sawWrongWords && rule.reasons.wrong) {
-    return [{ id: rule.reasons.wrong, labels: labelsOf(found) }];
+    return [{id: rule.reasons.wrong, labels: labelsOf(found)}];
   }
   if (sawBadCaps && rule.reasons.caps) {
-    return [{ id: rule.reasons.caps, labels: labelsOf(found) }];
+    return [{id: rule.reasons.caps, labels: labelsOf(found)}];
   }
   return [];
 }
@@ -207,13 +207,13 @@ function judgeFromList(rule: FieldRule, agg: AggregatedField | undefined): Reaso
   const designations = rule.designations ?? [];
   // Valid if any found phrase contains a legal core term — the judge confirms
   // against the list itself rather than trusting the reader's basis flag.
-  if (found.some((o) => matchesDesignation(o.text ?? "", designations))) {
+  if (found.some((observation) => matchesDesignation(observation.text ?? "", designations))) {
     return [];
   }
   // Not a legal designation. A read the reader admits it could not anchor
   // (basis = guess) is a specialty free-form name → unconfirmed. A read
   // presented as a designation that still isn't legal → invalid.
-  const claimed = found.filter((o) => o.basis !== "guess");
+  const claimed = found.filter((observation) => observation.basis !== "guess");
   if (claimed.length > 0 && rule.reasons.invalid) {
     return [
       {

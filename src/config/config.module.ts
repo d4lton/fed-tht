@@ -1,7 +1,7 @@
-import { Global, Module } from "@nestjs/common";
-import { ConfigModule } from "@nestjs/config";
-import { AppConfigService } from "./app-config.service";
-import { loadConfiguration } from "./configuration";
+import {Global, Module} from "@nestjs/common";
+import {ConfigModule} from "@nestjs/config";
+import {AppConfigService} from "./app-config.service";
+import {loadConfiguration} from "./configuration";
 
 /**
  * Wires NestJS's own config module to our per-environment loader and exposes

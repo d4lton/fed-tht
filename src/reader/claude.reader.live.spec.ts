@@ -1,10 +1,10 @@
-import { existsSync } from "fs";
-import { join } from "path";
-import { aggregate, ExpectedValues, judge } from "../core";
-import { loadSpiritsRules } from "../rules/rules-loader";
-import { thingsToLookFor } from "../pipeline/verify";
-import { createClaudeReader } from "./claude.reader";
-import { LabelImage } from "./label-reader";
+import {existsSync} from "fs";
+import {join} from "path";
+import {aggregate, ExpectedValues, judge} from "../core";
+import {loadSpiritsRules} from "../rules/rules-loader";
+import {thingsToLookFor} from "../pipeline/verify";
+import {createClaudeReader} from "./claude.reader";
+import {LabelImage} from "./label-reader";
 
 /**
  * The costly reading tests: they call the real model against generated label
@@ -34,7 +34,7 @@ async function verifyImages(images: LabelImage[]) {
   });
   const lookFor = thingsToLookFor(EXPECTED, rules);
   const reports = await Promise.all(images.map((image) => reader.read(image, "distilled-spirits", lookFor)));
-  return judge({ aggregated: aggregate(reports), expected: EXPECTED, rules });
+  return judge({aggregated: aggregate(reports), expected: EXPECTED, rules});
 }
 
 const suite = LIVE ? describe : describe.skip;
@@ -42,18 +42,18 @@ suite("ClaudeLabelReader against real images (costly — needs ANTHROPIC_API_KEY
   jest.setTimeout(90_000);
   it("a clean bourbon reads to a passing result", async () => {
     const result = await verifyImages([
-      { label: "front", source: join(LABELS, "front-clean.png") },
-      { label: "back", source: join(LABELS, "back-clean.png") }
+      {label: "front", source: join(LABELS, "front-clean.png")},
+      {label: "back", source: join(LABELS, "back-clean.png")}
     ]);
     expect(result.outcome).toBe("pass");
   });
   it("a mangled bourbon reads to a fail with the right reasons", async () => {
     const result = await verifyImages([
-      { label: "front", source: join(LABELS, "front-broken.png") },
-      { label: "back", source: join(LABELS, "back-broken.png") }
+      {label: "front", source: join(LABELS, "front-broken.png")},
+      {label: "back", source: join(LABELS, "back-broken.png")}
     ]);
     expect(result.outcome).toBe("fail");
-    const ids = result.reasons.map((r) => r.id);
+    const ids = result.reasons.map((reason) => reason.id);
     expect(ids).toContain("brand-wrong");
     expect(ids).toContain("warning-missing");
   });

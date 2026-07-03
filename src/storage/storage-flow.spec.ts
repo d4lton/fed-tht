@@ -1,17 +1,17 @@
-import { mkdtempSync } from "fs";
-import { tmpdir } from "os";
-import { join } from "path";
-import { DataSource } from "typeorm";
-import { LabelReadingReport } from "../core";
-import { GOVERNMENT_WARNING_TEXT } from "../core/validate/__fixtures__/spirits-rules.fixture";
-import { verifyLabels } from "../pipeline/verify";
-import { StandInReader } from "../reader";
-import { loadSpiritsRules } from "../rules/rules-loader";
-import { Application } from "./application.entity";
-import { ApplicationLoader } from "./application-loader";
-import { ApplicationStore } from "./application.store";
-import { DiskImageStore } from "./image-store/disk.image-store";
-import { seedApplication } from "./seed";
+import {mkdtempSync} from "fs";
+import {tmpdir} from "os";
+import {join} from "path";
+import {DataSource} from "typeorm";
+import {LabelReadingReport} from "../core";
+import {GOVERNMENT_WARNING_TEXT} from "../core/validate/__fixtures__/spirits-rules.fixture";
+import {verifyLabels} from "../pipeline/verify";
+import {StandInReader} from "../reader";
+import {loadSpiritsRules} from "../rules/rules-loader";
+import {Application} from "./application.entity";
+import {ApplicationLoader} from "./application-loader";
+import {ApplicationStore} from "./application.store";
+import {DiskImageStore} from "./image-store/disk.image-store";
+import {seedApplication} from "./seed";
 
 const rules = loadSpiritsRules();
 
@@ -32,7 +32,7 @@ async function makeEnv(): Promise<Env> {
   await ds.initialize();
   const store = new ApplicationStore(ds.getRepository(Application));
   const imageStore = new DiskImageStore(mkdtempSync(join(tmpdir(), "fed-tht-flow-")));
-  return { ds, store, imageStore, loader: new ApplicationLoader(store, imageStore) };
+  return {ds, store, imageStore, loader: new ApplicationLoader(store, imageStore)};
 }
 
 /** Seed a bourbon record with a front and a back image (bytes are placeholders). */
@@ -43,8 +43,8 @@ function seed(env: Env): Promise<string> {
     nameAndAddress: "Old Tom Distillery, Bardstown, KY",
     importedOrDomestic: "domestic",
     images: [
-      { label: "front", image: { bytes: new Uint8Array([1, 2, 3]), mediaType: "image/png" } },
-      { label: "back", image: { bytes: new Uint8Array([4, 5, 6]), mediaType: "image/png" } }
+      {label: "front", image: {bytes: new Uint8Array([1, 2, 3]), mediaType: "image/png"}},
+      {label: "back", image: {bytes: new Uint8Array([4, 5, 6]), mediaType: "image/png"}}
     ]
   });
 }
@@ -54,15 +54,15 @@ function cleanReads(): LabelReadingReport[] {
     {
       label: "front",
       fields: [
-        { field: "brand", state: "found", text: "Old Tom Distillery", basis: "confirmed" },
+        {field: "brand", state: "found", text: "Old Tom Distillery", basis: "confirmed"},
         {
           field: "name-and-address",
           state: "found",
           text: "Bottled by Old Tom Distillery, Bardstown, KY",
           basis: "confirmed"
         },
-        { field: "alcohol", state: "found", text: "45% Alc./Vol.", basis: "confirmed" },
-        { field: "net-contents", state: "found", text: "750 mL", basis: "confirmed" },
+        {field: "alcohol", state: "found", text: "45% Alc./Vol.", basis: "confirmed"},
+        {field: "net-contents", state: "found", text: "750 mL", basis: "confirmed"},
         {
           field: "class-type",
           state: "found",
@@ -73,7 +73,7 @@ function cleanReads(): LabelReadingReport[] {
     },
     {
       label: "back",
-      fields: [{ field: "warning", state: "found", text: GOVERNMENT_WARNING_TEXT, basis: "confirmed" }]
+      fields: [{field: "warning", state: "found", text: GOVERNMENT_WARNING_TEXT, basis: "confirmed"}]
     }
   ];
 }
@@ -81,7 +81,7 @@ function cleanReads(): LabelReadingReport[] {
 function mangledReads(): LabelReadingReport[] {
   const reads = cleanReads();
   // Wrong brand on the front, and no warning anywhere.
-  reads[0].fields[0] = { field: "brand", state: "found", text: "Totally Different", basis: "confirmed" };
+  reads[0].fields[0] = {field: "brand", state: "found", text: "Totally Different", basis: "confirmed"};
   reads[1].fields = [];
   return reads;
 }
@@ -124,7 +124,7 @@ describe("storage flow — load (from saved data) → read → combine → judge
       application: loaded.application
     });
     expect(result.outcome).toBe("fail");
-    const ids = result.reasons.map((r) => r.id);
+    const ids = result.reasons.map((reason) => reason.id);
     expect(ids).toContain("brand-wrong");
     expect(ids).toContain("warning-missing");
   });

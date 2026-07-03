@@ -1,8 +1,8 @@
-import { Inject, Injectable } from "@nestjs/common";
-import { DrinkType, ExpectedValues } from "../core";
-import { LabelImage } from "../reader";
-import { ApplicationStore } from "./application.store";
-import { IMAGE_STORE, ImageStore } from "./image-store/image-store";
+import {Inject, Injectable} from "@nestjs/common";
+import {DrinkType, ExpectedValues} from "../core";
+import {LabelImage} from "../reader";
+import {ApplicationStore} from "./application.store";
+import {IMAGE_STORE, ImageStore} from "./image-store/image-store";
 
 /**
  * What the pipeline's "load the application" step hands downstream: the clean
@@ -24,6 +24,7 @@ export interface LoadedApplication {
  */
 @Injectable()
 export class ApplicationLoader {
+
   constructor(
     private readonly applications: ApplicationStore,
     @Inject(IMAGE_STORE) private readonly images: ImageStore
@@ -52,4 +53,5 @@ export class ApplicationLoader {
       images
     };
   }
+
 }

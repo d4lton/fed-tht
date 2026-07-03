@@ -1,6 +1,6 @@
-import { DataSource } from "typeorm";
-import { Application } from "./application.entity";
-import { ApplicationNotFoundError, ApplicationStore } from "./application.store";
+import {DataSource} from "typeorm";
+import {Application} from "./application.entity";
+import {ApplicationNotFoundError, ApplicationStore} from "./application.store";
 
 /** A fresh in-memory database per test — the disk/Postgres schema stays portable. */
 async function makeStore(): Promise<{ ds: DataSource; store: ApplicationStore }> {
@@ -11,14 +11,14 @@ async function makeStore(): Promise<{ ds: DataSource; store: ApplicationStore }>
     synchronize: true
   });
   await ds.initialize();
-  return { ds, store: new ApplicationStore(ds.getRepository(Application)) };
+  return {ds, store: new ApplicationStore(ds.getRepository(Application))};
 }
 
 describe("ApplicationStore", () => {
   let ds: DataSource;
   let store: ApplicationStore;
   beforeEach(async () => {
-    ({ ds, store } = await makeStore());
+    ({ds, store} = await makeStore());
   });
   afterEach(async () => {
     await ds.destroy();
@@ -30,8 +30,8 @@ describe("ApplicationStore", () => {
       nameAndAddress: "Old Tom Distillery, Bardstown, KY",
       importedOrDomestic: "domestic",
       images: [
-        { label: "front", ref: "front.png" },
-        { label: "back", ref: "back.png" }
+        {label: "front", ref: "front.png"},
+        {label: "back", ref: "back.png"}
       ]
     });
     expect(saved.id).toBeTruthy();
@@ -42,8 +42,8 @@ describe("ApplicationStore", () => {
     expect(loaded.nameAndAddress).toBe("Old Tom Distillery, Bardstown, KY");
     expect(loaded.importedOrDomestic).toBe("domestic");
     expect(loaded.images).toEqual([
-      { label: "front", ref: "front.png" },
-      { label: "back", ref: "back.png" }
+      {label: "front", ref: "front.png"},
+      {label: "back", ref: "back.png"}
     ]);
     expect(loaded.status).toBe("draft");
     expect(loaded.createdAt).toBeInstanceOf(Date);

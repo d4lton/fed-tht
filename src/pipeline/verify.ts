@@ -1,5 +1,5 @@
-import { aggregate, DrinkType, ExpectedValues, judge, RulesForType, ValidationResult } from "../core";
-import { LabelImage, LabelReader, ThingsToLookFor } from "../reader";
+import {aggregate, DrinkType, ExpectedValues, judge, RulesForType, ValidationResult} from "../core";
+import {LabelImage, LabelReader, ThingsToLookFor} from "../reader";
 
 /**
  * The verification flow (verification pipeline steps 2–4): read each image
@@ -40,8 +40,8 @@ export async function verifyLabels(input: VerifyInput): Promise<ValidationResult
  * legal designations (pulled from the rules loaded in Phase 2).
  */
 export function thingsToLookFor(expected: ExpectedValues, rules: RulesForType): ThingsToLookFor {
-  const warning = rules.fields.find((f) => f.find === "fixed_text")?.fixedText;
-  const designations = rules.fields.find((f) => f.find === "from_list")?.designations ?? [];
+  const warning = rules.fields.find((rule) => rule.find === "fixed_text")?.fixedText;
+  const designations = rules.fields.find((rule) => rule.find === "from_list")?.designations ?? [];
   return {
     brand: expected.brand,
     nameAndAddress: expected.nameAndAddress,

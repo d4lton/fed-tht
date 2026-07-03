@@ -1,8 +1,8 @@
-import { mkdtempSync } from "fs";
-import { tmpdir } from "os";
-import { join } from "path";
-import { DiskImageStore } from "./disk.image-store";
-import { ImageNotFoundError } from "./image-store";
+import {mkdtempSync} from "fs";
+import {tmpdir} from "os";
+import {join} from "path";
+import {DiskImageStore} from "./disk.image-store";
+import {ImageNotFoundError} from "./image-store";
 
 describe("DiskImageStore", () => {
   let store: DiskImageStore;
@@ -12,7 +12,7 @@ describe("DiskImageStore", () => {
   });
   it("stores an image and fetches the same bytes back by reference", async () => {
     const bytes = new Uint8Array([1, 2, 3, 4, 5]);
-    const ref = await store.save({ bytes, mediaType: "image/png" });
+    const ref = await store.save({bytes, mediaType: "image/png"});
     const back = await store.load(ref);
     expect(Buffer.from(back.bytes)).toEqual(Buffer.from(bytes));
     expect(back.mediaType).toBe("image/png");

@@ -6,6 +6,6 @@
 export * from "./types";
 export * from "./aggregate/aggregate";
 export * from "./validate/validate";
-export { equalsLenient, containsPhrase, normalizedText, words } from "./text/normalize";
-export { matchesDesignation } from "./designations/match";
-export { checkWarning, WarningVerdict } from "./warning/warning";
+export {equalsLenient, containsPhrase, normalizedText, words} from "./text/normalize";
+export {matchesDesignation} from "./designations/match";
+export {checkWarning, WarningVerdict} from "./warning/warning";

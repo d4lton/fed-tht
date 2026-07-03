@@ -1,6 +1,5 @@
 // @ts-check
 import eslint from "@eslint/js";
-import eslintPluginPrettierRecommended from "eslint-plugin-prettier/recommended";
 import stylistic from "@stylistic/eslint-plugin";
 import globals from "globals";
 import tseslint from "typescript-eslint";
@@ -11,15 +10,14 @@ export default tseslint.config(
   },
   eslint.configs.recommended,
   ...tseslint.configs.recommendedTypeChecked,
-  eslintPluginPrettierRecommended,
   {
-    plugins: { "@stylistic": stylistic }
+    plugins: {"@stylistic": stylistic}
   },
   {
     // Type-aware linting for the TypeScript source.
     files: ["src/**/*.ts", "test/**/*.ts"],
     languageOptions: {
-      globals: { ...globals.node, ...globals.jest },
+      globals: {...globals.node, ...globals.jest},
       sourceType: "commonjs",
       parserOptions: {
         projectService: true,
@@ -27,7 +25,7 @@ export default tseslint.config(
       }
     },
     rules: {
-      "@typescript-eslint/no-explicit-any": "off",
+      "no-explicit-any": "off",
       "@typescript-eslint/no-floating-promises": "warn",
       "@typescript-eslint/no-unsafe-argument": "warn"
     }
@@ -38,30 +36,38 @@ export default tseslint.config(
     files: ["**/*.mjs", "**/*.cjs", "**/*.js"],
     ...tseslint.configs.disableTypeChecked,
     languageOptions: {
-      globals: { ...globals.node },
+      globals: {...globals.node},
       sourceType: "module"
     }
   },
   {
-    // Style rules that don't need type information — apply everywhere.
     rules: {
-      curly: ["error", "all"],
-      "@stylistic/padding-line-between-statements": [
-        "error",
-        { blankLine: "never", prev: "*", next: "*" },
-        { blankLine: "always", prev: "import", next: "*" },
-        { blankLine: "never", prev: "import", next: "import" },
-        {
-          blankLine: "any",
-          prev: "*",
-          next: ["function", "class", "export", "interface", "type", "enum"]
-        },
-        {
-          blankLine: "any",
-          prev: ["function", "class", "export", "interface", "type", "enum"],
-          next: "*"
-        }
-      ]
+      "arrow-spacing": ["warn"],
+      "block-spacing": ["warn"],
+      "camelcase": ["warn", {properties: "never", ignoreImports: true, ignoreGlobals: true, ignoreDestructuring: true}],
+      "func-call-spacing": ["warn", "never"],
+      "id-length": ["warn", {"min": 2, "exceptions": ["a", "b", "i", "j", "_"]}],
+      "no-multiple-empty-lines": ["warn", {"max": 1, "maxEOF": 0}],
+      "no-multi-spaces": ["warn"],
+      "no-whitespace-before-property": ["warn"],
+      "spaced-comment": ["warn", "always"],
+      "object-curly-spacing": ["warn"],
+      "quotes": ["warn", "double"],
+      "semi-spacing": ["warn"],
+      "space-in-parens": ["warn", "never"],
+      "space-infix-ops": ["warn"],
+      "space-unary-ops": ["warn"],
+      "brace-style": ["warn", "1tbs", {"allowSingleLine": true}],
+      "indent": ["warn", 2, {"SwitchCase": 1}],
+      "semi": ["warn"],
+      "keyword-spacing": ["warn"],
+      "key-spacing": ["warn", {"afterColon": true, "beforeColon": false}],
+      "comma-spacing": ["warn"],
+      "comma-dangle": ["warn", "never"],
+      "space-before-blocks": ["warn"],
+      "space-before-function-paren": ["warn", {"anonymous": "never", "named": "never", "asyncArrow": "always"}],
+      "@stylistic/type-annotation-spacing": ["warn"],
+      "@stylistic/padded-blocks": ["warn", {"classes": "always"}]
     }
   }
 );

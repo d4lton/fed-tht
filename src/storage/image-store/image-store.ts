@@ -23,8 +23,10 @@ export const IMAGE_STORE = Symbol("IMAGE_STORE");
 
 /** Fetching a reference that isn't in the store — a clear miss, not a crash. */
 export class ImageNotFoundError extends Error {
+
   constructor(readonly ref: string) {
     super(`image "${ref}" not found`);
     this.name = "ImageNotFoundError";
   }
+
 }

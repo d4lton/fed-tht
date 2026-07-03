@@ -1,10 +1,10 @@
-import { readFileSync } from "fs";
-import { extname } from "path";
-import { generateObject, type LanguageModel } from "ai";
-import { createAnthropic } from "@ai-sdk/anthropic";
-import { DrinkType, LabelReadingReport } from "../core";
-import { LabelImage, LabelReader, ThingsToLookFor } from "./label-reader";
-import { labelReportSchema, toLabelReadingReport } from "./label-report.schema";
+import {readFileSync} from "fs";
+import {extname} from "path";
+import {generateObject, type LanguageModel} from "ai";
+import {createAnthropic} from "@ai-sdk/anthropic";
+import {DrinkType, LabelReadingReport} from "../core";
+import {LabelImage, LabelReader, ThingsToLookFor} from "./label-reader";
+import {labelReportSchema, toLabelReadingReport} from "./label-report.schema";
 
 /**
  * The real reader: it looks at an actual label image and produces the
@@ -18,16 +18,18 @@ import { labelReportSchema, toLabelReadingReport } from "./label-report.schema";
  * Haiku) are chosen through config, so the reader can be swapped.
  */
 export class ClaudeLabelReader implements LabelReader {
+
   constructor(
-    private readonly model: LanguageModel,
-    private readonly timeoutMs: number
+    private readonly languageModel: LanguageModel,
+    private readonly timeoutMs: number,
+    readonly model: string = ""
   ) {}
 
   async read(image: LabelImage, type: DrinkType, lookFor: ThingsToLookFor): Promise<LabelReadingReport> {
     try {
-      const { bytes, mediaType } = loadImage(image);
-      const { object } = await generateObject({
-        model: this.model,
+      const {bytes, mediaType} = loadImage(image);
+      const {object} = await generateObject({
+        model: this.languageModel,
         schema: labelReportSchema,
         // Fail the read cleanly on a slow model rather than hanging.
         abortSignal: AbortSignal.timeout(this.timeoutMs),
@@ -36,8 +38,8 @@ export class ClaudeLabelReader implements LabelReader {
           {
             role: "user",
             content: [
-              { type: "text", text: buildUserPrompt(type, lookFor) },
-              { type: "image", image: bytes, mediaType }
+              {type: "text", text: buildUserPrompt(type, lookFor)},
+              {type: "image", image: bytes, mediaType}
             ]
           }
         ]
@@ -50,6 +52,7 @@ export class ClaudeLabelReader implements LabelReader {
       throw new ReaderError(`reading label "${image.label}" failed: ${describeError(error)}`, error);
     }
   }
+
 }
 
 /** Build a Claude reader from config: the provider and model are config choices. */
@@ -61,12 +64,13 @@ export interface ClaudeReaderConfig {
 }
 
 export function createClaudeReader(config: ClaudeReaderConfig): ClaudeLabelReader {
-  const anthropic = createAnthropic({ apiKey: config.apiKey });
-  return new ClaudeLabelReader(anthropic(config.model), config.timeoutMs);
+  const anthropic = createAnthropic({apiKey: config.apiKey});
+  return new ClaudeLabelReader(anthropic(config.model), config.timeoutMs, config.model);
 }
 
 /** A reader failure — a clear error, not a hang or a wrong answer. */
 export class ReaderError extends Error {
+
   constructor(
     message: string,
     readonly cause?: unknown
@@ -74,6 +78,7 @@ export class ReaderError extends Error {
     super(message);
     this.name = "ReaderError";
   }
+
 }
 
 // --- prompt ---------------------------------------------------------------
@@ -84,15 +89,15 @@ const SYSTEM_PROMPT = [
   "passes or fails — that judgement is made elsewhere, not by you.",
   "",
   "For each field, give its state:",
-  '- "found": the field is present (include the exact text you read, and',
+  "- \"found\": the field is present (include the exact text you read, and",
   "  roughly where on the label it sits if that is easy to say).",
-  '- "absent": the field is not on this label.',
-  '- "unreadable": the area where it might be is too blurry or obscured to read.',
+  "- \"absent\": the field is not on this label.",
+  "- \"unreadable\": the area where it might be is too blurry or obscured to read.",
   "",
-  'Set "basis" for a found field to "confirmed" when the text matches one of the',
+  "Set \"basis\" for a found field to \"confirmed\" when the text matches one of the",
   "known values you were given to look for (the expected brand, the expected",
   "name and address, the exact warning wording, or a legal class/type",
-  'designation from the provided list). Set it to "guess" when you recognized',
+  "designation from the provided list). Set it to \"guess\" when you recognized",
   "something on your own with nothing to match it against — for example a",
   "specialty product's made-up or fanciful designation.",
   "",
@@ -105,7 +110,7 @@ const TYPE_NAMES: Record<DrinkType, string> = {
 };
 
 function buildUserPrompt(type: DrinkType, lookFor: ThingsToLookFor): string {
-  const designations = lookFor.designations.map((d) => d.designation).join(", ") || "(none)";
+  const designations = lookFor.designations.map((designation) => designation.designation).join(", ") || "(none)";
   return [
     `This is a ${TYPE_NAMES[type]} label.`,
     "Report these fields: brand, name-and-address, warning, alcohol,",

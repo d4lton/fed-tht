@@ -9,7 +9,7 @@
  * tests build it directly, with no file reading.
  */
 
-import { CanonicalField, DrinkType } from "./reads";
+import {CanonicalField, DrinkType} from "./reads";
 
 /** Find-strategy: how a field is located and anchored. */
 export type FindStrategy =

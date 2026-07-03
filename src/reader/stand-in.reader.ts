@@ -1,5 +1,5 @@
-import { LabelReadingReport } from "../core";
-import { LabelImage, LabelReader } from "./label-reader";
+import {LabelReadingReport} from "../core";
+import {LabelImage, LabelReader} from "./label-reader";
 
 /**
  * A stand-in reader: instead of looking at an image, it returns pre-set reads it
@@ -12,6 +12,8 @@ import { LabelImage, LabelReader } from "./label-reader";
  * unused slot parameters, which still satisfies the {@link LabelReader} contract.
  */
 export class StandInReader implements LabelReader {
+
+  readonly model = "stand-in";
   private readonly reports: Map<string, LabelReadingReport>;
 
   constructor(reports: Iterable<LabelReadingReport>) {
@@ -28,4 +30,5 @@ export class StandInReader implements LabelReader {
     }
     return Promise.resolve(report);
   }
+
 }

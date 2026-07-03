@@ -1,7 +1,7 @@
-import { aggregate } from "../aggregate/aggregate";
-import { CanonicalField, ExpectedValues, FieldRead, LabelReadingReport, Reason, ValidationResult } from "../types";
-import { judge } from "./validate";
-import { GOVERNMENT_WARNING_TEXT, makeSpiritsRules } from "./__fixtures__/spirits-rules.fixture";
+import {aggregate} from "../aggregate/aggregate";
+import {CanonicalField, ExpectedValues, FieldRead, LabelReadingReport, Reason, ValidationResult} from "../types";
+import {judge} from "./validate";
+import {GOVERNMENT_WARNING_TEXT, makeSpiritsRules} from "./__fixtures__/spirits-rules.fixture";
 
 // --- test helpers ---------------------------------------------------------
 const DOMESTIC: ExpectedValues = {
@@ -63,7 +63,7 @@ function validReports(): LabelReadingReport[] {
 }
 
 function labelOf(reports: LabelReadingReport[], label: string): LabelReadingReport {
-  const report = reports.find((r) => r.label === label);
+  const report = reports.find((candidate) => candidate.label === label);
   if (!report) {
     throw new Error(`test setup: no label "${label}"`);
   }
@@ -72,7 +72,7 @@ function labelOf(reports: LabelReadingReport[], label: string): LabelReadingRepo
 
 function setRead(reports: LabelReadingReport[], label: string, read: FieldRead): void {
   const report = labelOf(reports, label);
-  const index = report.fields.findIndex((f) => f.field === read.field);
+  const index = report.fields.findIndex((fieldRead) => fieldRead.field === read.field);
   if (index >= 0) {
     report.fields[index] = read;
   } else {
@@ -82,7 +82,7 @@ function setRead(reports: LabelReadingReport[], label: string, read: FieldRead):
 
 function removeField(reports: LabelReadingReport[], label: string, field: CanonicalField): void {
   const report = labelOf(reports, label);
-  report.fields = report.fields.filter((f) => f.field !== field);
+  report.fields = report.fields.filter((fieldRead) => fieldRead.field !== field);
 }
 
 function run(reports: LabelReadingReport[], expected: ExpectedValues = DOMESTIC): ValidationResult {
@@ -94,11 +94,11 @@ function run(reports: LabelReadingReport[], expected: ExpectedValues = DOMESTIC)
 }
 
 function ids(result: ValidationResult): string[] {
-  return result.reasons.map((r) => r.id);
+  return result.reasons.map((reason) => reason.id);
 }
 
 function reasonFor(result: ValidationResult, id: string): Reason | undefined {
-  return result.reasons.find((r) => r.id === id);
+  return result.reasons.find((reason) => reason.id === id);
 }
 // --- the baseline ---------------------------------------------------------
 describe("judge — a fully compliant bourbon", () => {
@@ -168,7 +168,7 @@ describe("brand", () => {
       text: "STONE'S THROW",
       basis: "confirmed"
     });
-    const result = run(reports, { ...DOMESTIC, brand: "Stone's Throw" });
+    const result = run(reports, {...DOMESTIC, brand: "Stone's Throw"});
     expect(ids(result)).not.toContain("brand-wrong");
   });
   it("fails brand-wrong: differs from the application brand", () => {
@@ -196,7 +196,7 @@ describe("brand", () => {
 });
 // --- name and address -----------------------------------------------------
 describe("name and address", () => {
-  it('passes: right producer, wrapped in "Bottled by …, City, ST"', () => {
+  it("passes: right producer, wrapped in \"Bottled by …, City, ST\"", () => {
     expect(run(validReports()).outcome).toBe("pass");
   });
   it("fails name-address-wrong: a different producer", () => {
@@ -239,7 +239,7 @@ describe("net contents", () => {
 });
 // --- class/type -----------------------------------------------------------
 describe("class/type", () => {
-  it('passes: a valid designation ("Kentucky Straight Bourbon Whiskey")', () => {
+  it("passes: a valid designation (\"Kentucky Straight Bourbon Whiskey\")", () => {
     expect(run(validReports()).outcome).toBe("pass");
   });
   it("fails class-type-invalid: a non-designation phrase", () => {
@@ -321,8 +321,8 @@ describe("labels agreeing", () => {
     const reason = reasonFor(result, "alcohol-conflict");
     expect(reason?.labels.sort()).toEqual(["back", "front"]);
     expect(reason?.values).toEqual([
-      { label: "front", value: "45% Alc./Vol. (90 Proof)" },
-      { label: "back", value: "40% Alc./Vol. (80 Proof)" }
+      {label: "front", value: "45% Alc./Vol. (90 Proof)"},
+      {label: "back", value: "40% Alc./Vol. (80 Proof)"}
     ]);
   });
   it("fails brand-conflict: two brand spellings, without also firing brand-wrong", () => {
@@ -346,7 +346,7 @@ describe("labels agreeing", () => {
 describe("unreadable required field", () => {
   it("fails rather than slipping through: warning unreadable on the only label carrying it", () => {
     const reports = validReports();
-    setRead(reports, "back", { field: "warning", state: "unreadable" });
+    setRead(reports, "back", {field: "warning", state: "unreadable"});
     const result = run(reports);
     expect(result.outcome).toBe("fail");
     const reason = reasonFor(result, "warning-unreadable");
@@ -358,7 +358,7 @@ describe("unreadable required field", () => {
 describe("sulfites", () => {
   it("the spirits rules carry no sulfite rule", () => {
     const rules = makeSpiritsRules();
-    expect(rules.fields.some((f) => f.field.includes("sulfite"))).toBe(false);
+    expect(rules.fields.some((rule) => rule.field.includes("sulfite"))).toBe(false);
   });
   it("a passing spirit never produces a sulfite reason", () => {
     const result = run(validReports());

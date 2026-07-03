@@ -1,8 +1,8 @@
-import { Inject, Module, OnModuleDestroy } from "@nestjs/common";
-import { Pool } from "pg";
-import { AppConfigService } from "../config/app-config.service";
-import { DatabaseHealthService } from "./database-health.service";
-import { PG_POOL } from "./database.constants";
+import {Inject, Module, OnModuleDestroy} from "@nestjs/common";
+import {Pool} from "pg";
+import {AppConfigService} from "../config/app-config.service";
+import {DatabaseHealthService} from "./database-health.service";
+import {PG_POOL} from "./database.constants";
 
 /**
  * Owns the Postgres connection at the outer edge of the app. The pure core
@@ -38,9 +38,11 @@ import { PG_POOL } from "./database.constants";
   exports: [DatabaseHealthService]
 })
 export class DatabaseModule implements OnModuleDestroy {
+
   constructor(@Inject(PG_POOL) private readonly pool: Pool) {}
 
   async onModuleDestroy(): Promise<void> {
     await this.pool.end();
   }
+
 }

@@ -1,10 +1,10 @@
-import { Designation } from "../types";
-import { matchesDesignation } from "./match";
+import {Designation} from "../types";
+import {matchesDesignation} from "./match";
 
 const DESIGNATIONS: Designation[] = [
-  { designation: "Bourbon Whiskey", coreTerms: ["bourbon whiskey", "bourbon"] },
-  { designation: "Gin", coreTerms: ["gin"] },
-  { designation: "Rum", coreTerms: ["rum"] }
+  {designation: "Bourbon Whiskey", coreTerms: ["bourbon whiskey", "bourbon"]},
+  {designation: "Gin", coreTerms: ["gin"]},
+  {designation: "Rum", coreTerms: ["rum"]}
 ];
 describe("matchesDesignation", () => {
   it("finds a core term inside a longer phrase", () => {

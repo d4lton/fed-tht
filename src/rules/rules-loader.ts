@@ -1,5 +1,5 @@
-import { readFileSync } from "fs";
-import { join } from "path";
+import {readFileSync} from "fs";
+import {join} from "path";
 import * as yaml from "js-yaml";
 import * as Joi from "joi";
 import {
@@ -120,7 +120,7 @@ export interface RuleResources {
 export function buildRulesForType(rawRulesInput: unknown, resources: RuleResources, source = "rules"): RulesForType {
   const raw = parse<RawRules>(rulesSchema, rawRulesInput, source);
   const fields = raw.fields.map((field) => assembleField(field, resources, source));
-  return { type: raw.type, fields };
+  return {type: raw.type, fields};
 }
 
 function assembleField(raw: RawField, resources: RuleResources, source: string): FieldRule {
@@ -162,11 +162,11 @@ function assembleField(raw: RawField, resources: RuleResources, source: string):
 
 function toObligation(required: RawRequired): Obligation {
   if (required === "always") {
-    return { required: true };
+    return {required: true};
   }
   return {
     required: true,
-    condition: { tag: required.when, source: required.source }
+    condition: {tag: required.when, source: required.source}
   };
 }
 
@@ -187,9 +187,9 @@ function loadFixedText(file: string): FixedText {
 
 function loadDesignations(file: string): Designation[] {
   const raw = parse<RawDesignation[]>(designationsSchema, loadYamlFile(file), file);
-  return raw.map((d) => ({
-    designation: d.designation,
-    coreTerms: d.core_terms.map((t) => t.toLowerCase())
+  return raw.map((rawDesignation) => ({
+    designation: rawDesignation.designation,
+    coreTerms: rawDesignation.core_terms.map((term) => term.toLowerCase())
   }));
 }
 
@@ -198,8 +198,8 @@ export function loadSpiritsRules(): RulesForType {
   const warning = loadFixedText("government-warning.yaml");
   const designations = loadDesignations("spirit-designations.yaml");
   const resources: RuleResources = {
-    fixedTexts: { [warning.id]: warning },
-    lists: { "spirit-designations": designations }
+    fixedTexts: {[warning.id]: warning},
+    lists: {"spirit-designations": designations}
   };
   return buildRulesForType(loadYamlFile("spirits.rules.yaml"), resources, "spirits.rules.yaml");
 }

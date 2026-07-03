@@ -1,4 +1,4 @@
-import { RulesForType } from "../../types";
+import {RulesForType} from "../../types";
 
 /**
  * The distilled-spirits rules, built in code for the core's own tests — the
@@ -20,7 +20,7 @@ export function makeSpiritsRules(): RulesForType {
         field: "brand",
         find: "from_expected",
         match: "lenient",
-        obligation: { required: true },
+        obligation: {required: true},
         reasons: {
           missing: "brand-missing",
           wrong: "brand-wrong",
@@ -31,7 +31,7 @@ export function makeSpiritsRules(): RulesForType {
         field: "name-and-address",
         find: "from_expected",
         match: "loose",
-        obligation: { required: true },
+        obligation: {required: true},
         reasons: {
           missing: "name-address-missing",
           wrong: "name-address-wrong",
@@ -46,7 +46,7 @@ export function makeSpiritsRules(): RulesForType {
           text: GOVERNMENT_WARNING_TEXT,
           capsWords: ["GOVERNMENT WARNING"]
         },
-        obligation: { required: true },
+        obligation: {required: true},
         reasons: {
           missing: "warning-missing",
           wrong: "warning-wrong",
@@ -59,14 +59,14 @@ export function makeSpiritsRules(): RulesForType {
         field: "alcohol",
         find: "by_format",
         format: "alcohol",
-        obligation: { required: true },
-        reasons: { missing: "alcohol-missing", conflict: "alcohol-conflict" }
+        obligation: {required: true},
+        reasons: {missing: "alcohol-missing", conflict: "alcohol-conflict"}
       },
       {
         field: "net-contents",
         find: "by_format",
         format: "net-contents",
-        obligation: { required: true },
+        obligation: {required: true},
         reasons: {
           missing: "net-contents-missing",
           conflict: "net-contents-conflict"
@@ -76,17 +76,17 @@ export function makeSpiritsRules(): RulesForType {
         field: "class-type",
         find: "from_list",
         designations: [
-          { designation: "Whisky", coreTerms: ["whisky", "whiskey"] },
+          {designation: "Whisky", coreTerms: ["whisky", "whiskey"]},
           {
             designation: "Bourbon Whiskey",
             coreTerms: ["bourbon whiskey", "bourbon"]
           },
-          { designation: "Rye Whiskey", coreTerms: ["rye whiskey", "rye"] },
-          { designation: "Vodka", coreTerms: ["vodka"] },
-          { designation: "Gin", coreTerms: ["gin"] },
-          { designation: "Rum", coreTerms: ["rum"] }
+          {designation: "Rye Whiskey", coreTerms: ["rye whiskey", "rye"]},
+          {designation: "Vodka", coreTerms: ["vodka"]},
+          {designation: "Gin", coreTerms: ["gin"]},
+          {designation: "Rum", coreTerms: ["rum"]}
         ],
-        obligation: { required: true },
+        obligation: {required: true},
         reasons: {
           missing: "class-type-missing",
           invalid: "class-type-invalid",
@@ -100,7 +100,7 @@ export function makeSpiritsRules(): RulesForType {
         format: "country-of-origin",
         obligation: {
           required: true,
-          condition: { tag: "imported", source: "application" }
+          condition: {tag: "imported", source: "application"}
         },
         reasons: {
           missing: "country-of-origin-missing",

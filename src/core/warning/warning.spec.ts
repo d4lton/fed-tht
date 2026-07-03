@@ -1,6 +1,6 @@
-import { FixedText } from "../types";
-import { checkWarning } from "./warning";
-import { GOVERNMENT_WARNING_TEXT } from "../validate/__fixtures__/spirits-rules.fixture";
+import {FixedText} from "../types";
+import {checkWarning} from "./warning";
+import {GOVERNMENT_WARNING_TEXT} from "../validate/__fixtures__/spirits-rules.fixture";
 
 const WARNING: FixedText = {
   id: "government-warning",

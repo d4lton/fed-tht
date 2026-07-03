@@ -1,7 +1,7 @@
-import { DrinkType, ExpectedValues, LabelReadingReport } from "../core";
-import { GOVERNMENT_WARNING_TEXT, makeSpiritsRules } from "../core/validate/__fixtures__/spirits-rules.fixture";
-import { LabelImage, LabelReader, StandInReader, ThingsToLookFor } from "../reader";
-import { thingsToLookFor, verifyLabels } from "./verify";
+import {DrinkType, ExpectedValues, LabelReadingReport} from "../core";
+import {GOVERNMENT_WARNING_TEXT, makeSpiritsRules} from "../core/validate/__fixtures__/spirits-rules.fixture";
+import {LabelImage, LabelReader, StandInReader, ThingsToLookFor} from "../reader";
+import {thingsToLookFor, verifyLabels} from "./verify";
 
 const TYPE: DrinkType = "distilled-spirits";
 const RULES = makeSpiritsRules();
@@ -10,7 +10,7 @@ const EXPECTED: ExpectedValues = {
   nameAndAddress: "Old Tom Distillery, Bardstown, KY",
   importedOrDomestic: "domestic"
 };
-const IMAGES: LabelImage[] = [{ label: "front" }, { label: "back" }];
+const IMAGES: LabelImage[] = [{label: "front"}, {label: "back"}];
 
 // --- scenario reads (hand-written, no images) -----------------------------
 
@@ -142,7 +142,7 @@ describe("verifyLabels — read → combine → judge through the reader slot", 
   it("fails a mangled set, carrying the right reasons", async () => {
     const result = await run(new StandInReader(mangledBourbon()));
     expect(result.outcome).toBe("fail");
-    expect(result.reasons.map((r) => r.id).sort()).toEqual(["alcohol-conflict", "brand-wrong", "warning-missing"].sort());
+    expect(result.reasons.map((reason) => reason.id).sort()).toEqual(["alcohol-conflict", "brand-wrong", "warning-missing"].sort());
   });
   it("swapping the reader is all that changes", async () => {
     // Same images/type/expected/rules; only the reader differs.
@@ -154,7 +154,7 @@ describe("verifyLabels — read → combine → judge through the reader slot", 
   it("reads through the slot: once per image, handed the things to look for", async () => {
     const recorder = new RecordingReader(cleanBourbon());
     await run(recorder);
-    expect(recorder.calls.map((c) => c.image.label)).toEqual(["front", "back"]);
+    expect(recorder.calls.map((call) => call.image.label)).toEqual(["front", "back"]);
     for (const call of recorder.calls) {
       expect(call.type).toBe(TYPE);
       expect(call.lookFor.brand).toBe(EXPECTED.brand);
@@ -169,12 +169,14 @@ describe("thingsToLookFor", () => {
     const lookFor = thingsToLookFor(EXPECTED, RULES);
     expect(lookFor.brand).toBe(EXPECTED.brand);
     expect(lookFor.warning?.capsWords).toContain("GOVERNMENT WARNING");
-    expect(lookFor.designations.some((d) => d.designation === "Bourbon Whiskey")).toBe(true);
+    expect(lookFor.designations.some((designation) => designation.designation === "Bourbon Whiskey")).toBe(true);
   });
 });
 
 /** A reader that records how the slot was called, for the wiring assertions. */
 class RecordingReader implements LabelReader {
+
+  readonly model = "recording";
   readonly calls: Array<{
     image: LabelImage;
     type: DrinkType;
@@ -183,15 +185,16 @@ class RecordingReader implements LabelReader {
   private readonly reports: Map<string, LabelReadingReport>;
 
   constructor(reports: LabelReadingReport[]) {
-    this.reports = new Map(reports.map((r) => [r.label, r]));
+    this.reports = new Map(reports.map((report) => [report.label, report]));
   }
 
   read(image: LabelImage, type: DrinkType, lookFor: ThingsToLookFor): Promise<LabelReadingReport> {
-    this.calls.push({ image, type, lookFor });
+    this.calls.push({image, type, lookFor});
     const report = this.reports.get(image.label);
     if (!report) {
       return Promise.reject(new Error(`no read for ${image.label}`));
     }
     return Promise.resolve(report);
   }
+
 }

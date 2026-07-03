@@ -1,5 +1,5 @@
-import { readFileSync } from "fs";
-import { join } from "path";
+import {readFileSync} from "fs";
+import {join} from "path";
 
 /**
  * Test config source: reads `config/config.test.json` from the project root.

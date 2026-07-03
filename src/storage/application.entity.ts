@@ -1,5 +1,6 @@
-import { Column, CreateDateColumn, Entity, PrimaryColumn, UpdateDateColumn } from "typeorm";
-import { DrinkType, OriginStatus } from "../core";
+import {Column, CreateDateColumn, Entity, PrimaryColumn, UpdateDateColumn} from "typeorm";
+import {DrinkType, OriginStatus} from "../core";
+import type {CheckResult} from "../checks/check-result";
 
 /** One label image on the record: which label, and its reference in the store. */
 export interface ImageRef {
@@ -19,38 +20,48 @@ export type ApplicationStatus = "draft" | "ready";
  * Column types are kept portable (varchar + simple-json) so the same entity
  * works against Postgres in the real app and an in-memory database in tests.
  */
-@Entity({ name: "applications" })
+@Entity({name: "applications"})
 export class Application {
+
   /** How every other part of the system refers to this application. */
   @PrimaryColumn("uuid")
-  id!: string;
+    id!: string;
 
   /** Picks which rule set applies during validation. */
-  @Column({ type: "varchar" })
-  drinkType!: DrinkType;
+  @Column({type: "varchar"})
+    drinkType!: DrinkType;
 
   /** A value we look for on the label and compare against. */
-  @Column({ type: "varchar" })
-  brand!: string;
+  @Column({type: "varchar"})
+    brand!: string;
 
   /** The producer/bottler's name and address, compared against the label. */
-  @Column({ type: "varchar" })
-  nameAndAddress!: string;
+  @Column({type: "varchar"})
+    nameAndAddress!: string;
 
   /** A stored fact that switches the country-of-origin rule on or off. */
-  @Column({ type: "varchar" })
-  importedOrDomestic!: OriginStatus;
+  @Column({type: "varchar"})
+    importedOrDomestic!: OriginStatus;
 
   /** References to the label images (front/back/neck); loaded by reference. */
-  @Column({ type: "simple-json" })
-  images!: ImageRef[];
+  @Column({type: "simple-json"})
+    images!: ImageRef[];
 
-  @Column({ type: "varchar", default: "draft" })
-  status!: ApplicationStatus;
+  @Column({type: "varchar", default: "draft"})
+    status!: ApplicationStatus;
+
+  /**
+   * The last validation result — set every time the application is saved
+   * (creating or changing it re-runs the check), so a saved application always
+   * carries a current result. Null only for records seeded outside that flow.
+   */
+  @Column({type: "simple-json", nullable: true})
+    result!: CheckResult | null;
 
   @CreateDateColumn()
-  createdAt!: Date;
+    createdAt!: Date;
 
   @UpdateDateColumn()
-  updatedAt!: Date;
+    updatedAt!: Date;
+
 }
