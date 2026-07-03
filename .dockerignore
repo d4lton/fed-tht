@@ -1,0 +1,16 @@
+# Keep the build context (and image) lean.
+node_modules
+dist
+coverage
+.git
+.gitignore
+*.log
+npm-debug.log*
+.DS_Store
+.idea
+.vscode
+test
+**/*.spec.ts
+Dockerfile
+.dockerignore
+docker-compose.yml

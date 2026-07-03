@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { AppConfig } from './config.schema';
+import { AppConfig, DatabaseConfig } from './config.schema';
 import { APP_CONFIG_NAMESPACE } from './configuration';
 
 /**
@@ -27,5 +27,9 @@ export class AppConfigService {
 
   get serviceName(): string {
     return this.app.serviceName;
+  }
+
+  get database(): DatabaseConfig {
+    return this.app.database;
   }
 }

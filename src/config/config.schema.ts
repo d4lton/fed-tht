@@ -6,8 +6,8 @@ import * as Joi from 'joi';
  * label *rules* config (the per-type domain data), which lives separately and
  * must never be wired into this.
  *
- * For Phase 1 this is deliberately tiny: just enough to prove each source
- * (local / test / production) loads and validates at startup.
+ * Kept small: just enough to prove each source (local / test / production)
+ * loads and validates at startup, plus the database connection (Phase 3).
  */
 export interface AppConfig {
   /** Which environment produced these settings. */
@@ -16,6 +16,20 @@ export interface AppConfig {
   port: number;
   /** Human-readable service name, surfaced on the health endpoint. */
   serviceName: string;
+  /** Postgres connection settings. In dev these point at the Compose database. */
+  database: DatabaseConfig;
+}
+
+/**
+ * Where to reach Postgres. The local password is a throwaway development value
+ * kept in `config.local.json`; production credentials come from GCP.
+ */
+export interface DatabaseConfig {
+  host: string;
+  port: number;
+  name: string;
+  user: string;
+  password: string;
 }
 
 /**
@@ -26,4 +40,11 @@ export const configSchema = Joi.object<AppConfig>({
   env: Joi.string().valid('local', 'test', 'production').required(),
   port: Joi.number().port().required(),
   serviceName: Joi.string().min(1).required(),
+  database: Joi.object<DatabaseConfig>({
+    host: Joi.string().min(1).required(),
+    port: Joi.number().port().required(),
+    name: Joi.string().min(1).required(),
+    user: Joi.string().min(1).required(),
+    password: Joi.string().required(),
+  }).required(),
 });

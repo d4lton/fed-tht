@@ -14,7 +14,14 @@
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "format:check": "prettier --check \"src/**/*.ts\" \"test/**/*.ts\"",
     "test": "jest",
-    "test:e2e": "jest --config ./test/jest-e2e.json"
+    "test:e2e": "jest --config ./test/jest-e2e.json",
+    "db:up": "docker compose up -d postgres",
+    "db:down": "docker compose down",
+    "db:reset": "docker compose down -v",
+    "db:logs": "docker compose logs -f postgres",
+    "app:up": "docker compose up -d --build",
+    "app:down": "docker compose down",
+    "app:logs": "docker compose logs -f app"
   },
   "dependencies": {
     "@nestjs/common": "^11.0.0",
@@ -23,6 +30,7 @@
     "@nestjs/platform-express": "^11.0.0",
     "joi": "^17.13.3",
     "js-yaml": "^4.3.0",
+    "pg": "^8.22.0",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1"
   },
@@ -35,6 +43,7 @@
     "@types/jest": "^29.5.14",
     "@types/js-yaml": "^4.0.9",
     "@types/node": "^22.10.0",
+    "@types/pg": "^8.20.0",
     "@types/supertest": "^6.0.2",
     "eslint": "^9.17.0",
     "eslint-config-prettier": "^10.0.0",

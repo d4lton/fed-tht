@@ -1,5 +1,12 @@
 {
   "env": "local",
   "port": 3000,
-  "serviceName": "fed-tht-label-check"
+  "serviceName": "fed-tht-label-check",
+  "database": {
+    "host": "localhost",
+    "port": 5432,
+    "name": "fedtht_dev",
+    "user": "fedtht",
+    "password": "fedtht_dev_pw"
+  }
 }

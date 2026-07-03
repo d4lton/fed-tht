@@ -20,10 +20,17 @@ describe('Health (e2e)', () => {
     await app.close();
   });
 
-  it('GET /health returns ok', async () => {
+  it('GET /health returns ok and reports database reachability', async () => {
     const server = app.getHttpServer() as Server;
     const res = await request(server).get('/health').expect(200);
+    const body = res.body as {
+      status: string;
+      database?: { reachable?: unknown };
+    };
 
-    expect(res.body).toMatchObject({ status: 'ok' });
+    expect(body).toMatchObject({ status: 'ok' });
+    // Reachability is reported as a boolean either way; its value depends on
+    // whether the Compose database happens to be up during the test run.
+    expect(typeof body.database?.reachable).toBe('boolean');
   });
 });

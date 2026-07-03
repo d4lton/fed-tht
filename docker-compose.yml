@@ -1,0 +1,62 @@
+# Local development environment.
+#
+# A plain start-up runs the whole app — the app service plus its database:
+#
+#   docker compose up -d --build   # build + run the app and Postgres
+#   docker compose down            # stop everything (data is kept)
+#   docker compose down -v         # stop and delete the data volume
+#
+# For the everyday coding loop (fast reload), start just the database by name and
+# run the app however you prefer — on your machine, or with your code shared in:
+#
+#   docker compose up -d postgres  # database only, no app
+#
+# Watch out: a plain start-up runs the app inside Compose on port 3000, so if you
+# are ALSO running it on your machine, start just the database instead — the two
+# would otherwise collide on that port.
+#
+# The password here is a throwaway development value and is intentionally in the
+# repo. Production credentials come from GCP, never from this file.
+
+services:
+  postgres:
+    image: postgres:16.4-alpine
+    container_name: fed-tht-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: fedtht_dev
+      POSTGRES_USER: fedtht
+      POSTGRES_PASSWORD: fedtht_dev_pw
+    ports:
+      - '5432:5432'
+    volumes:
+      # A named volume, so the data survives `docker compose down` and restarts.
+      - fed-tht-pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U fedtht -d fedtht_dev']
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # The packaged app, a normal default service. A plain `docker compose up`
+  # brings it up alongside the database. For the coding loop, start just
+  # `postgres` by name and run the app yourself instead.
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: fed-tht-app
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      # Use the local config source, but reach Postgres by its Compose service
+      # name instead of the file's localhost default.
+      NODE_ENV: local
+      DB_HOST: postgres
+    ports:
+      - '3000:3000'
+
+volumes:
+  fed-tht-pgdata:

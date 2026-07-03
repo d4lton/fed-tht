@@ -58,6 +58,29 @@ mode).
 - Run tests: `npm test` (unit) and `npm run test:e2e` (boots the app)
 - Lint: `npm run lint` (add `:fix` to auto-fix)
 - Format: `npm run format` (or `npm run format:check`)
+- Whole app in Compose: `npm run app:up` builds the `Dockerfile` image and runs
+  the app plus Postgres (a plain start-up; `app:down` stops it, `app:logs` tails
+  it). This is `docker compose up -d --build`.
+- Database only (coding loop): `npm run db:up` starts just Postgres
+  (`db:down` stops everything keeping data; `db:reset` also deletes the data
+  volume; `db:logs` tails it).
+
+Two ways to run locally, and the database address differs between them:
+
+- **Coding loop (fast reload):** `npm run db:up` (Postgres only), then the app on
+  your machine with `npm run start` — the app reaches the database at
+  `localhost`.
+- **Whole app in Compose:** `npm run app:up` runs the app as its built image
+  alongside Postgres, reaching the database by service name (`DB_HOST=postgres`
+  overrides the file's localhost). Don't also run it on your machine at the same
+  time — both bind port 3000.
+
+Both sets of connection values are local config. `GET /health` reports database
+reachability (`database.reachable`) so you can confirm the wiring either way. The
+image is multi-stage and runs as the non-root `node` user; it is essentially what
+gets deployed later. The persistence library is deliberately not chosen yet
+(storage phase); Phase 3 uses only a minimal `SELECT 1` reachability check under
+`src/database/`.
 
 The environment selects the runtime-config source via `NODE_ENV`:
 `local` (default) reads `config/config.local.json`, `test` reads

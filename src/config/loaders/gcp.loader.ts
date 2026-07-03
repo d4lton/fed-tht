@@ -17,5 +17,12 @@ export function loadGcpConfig(): unknown {
     env: 'production',
     port: process.env.PORT ? Number(process.env.PORT) : undefined,
     serviceName: process.env.SERVICE_NAME,
+    database: {
+      host: process.env.DB_HOST,
+      port: process.env.DB_PORT ? Number(process.env.DB_PORT) : undefined,
+      name: process.env.DB_NAME,
+      user: process.env.DB_USER,
+      password: process.env.DB_PASSWORD,
+    },
   };
 }
