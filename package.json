@@ -21,7 +21,9 @@
     "db:logs": "docker compose logs -f postgres",
     "app:up": "docker compose up -d --build",
     "app:down": "docker compose down",
-    "app:logs": "docker compose logs -f app"
+    "app:logs": "docker compose logs -f app",
+    "migration:run": "typeorm-ts-node-commonjs migration:run -d src/storage/data-source.ts",
+    "migration:revert": "typeorm-ts-node-commonjs migration:revert -d src/storage/data-source.ts"
   },
   "dependencies": {
     "@ai-sdk/anthropic": "^3.0.92",
@@ -29,12 +31,14 @@
     "@nestjs/config": "^4.0.0",
     "@nestjs/core": "^11.0.0",
     "@nestjs/platform-express": "^11.0.0",
+    "@nestjs/typeorm": "^11.0.3",
     "ai": "^6.0.219",
     "joi": "^17.13.3",
     "js-yaml": "^4.3.0",
     "pg": "^8.22.0",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1",
+    "typeorm": "^1.0.0",
     "zod": "^4.4.3"
   },
   "devDependencies": {
@@ -48,6 +52,7 @@
     "@types/js-yaml": "^4.0.9",
     "@types/node": "^22.10.0",
     "@types/pg": "^8.20.0",
+    "@types/sql.js": "^1.4.11",
     "@types/supertest": "^6.0.2",
     "eslint": "^9.17.0",
     "eslint-config-prettier": "^10.0.0",
@@ -55,6 +60,7 @@
     "globals": "^15.14.0",
     "jest": "^29.7.0",
     "prettier": "^3.4.2",
+    "sql.js": "^1.14.1",
     "supertest": "^7.0.0",
     "ts-jest": "^29.2.5",
     "ts-loader": "^9.5.1",
@@ -71,6 +77,9 @@
     ],
     "rootDir": "src",
     "testRegex": ".*\\.spec\\.ts$",
+    "setupFiles": [
+      "reflect-metadata"
+    ],
     "transform": {
       "^.+\\.(t|j)s$": "ts-jest"
     },

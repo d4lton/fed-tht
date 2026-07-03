@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
-import { AppConfig, DatabaseConfig, ReaderConfig } from "./config.schema";
+import { AppConfig, DatabaseConfig, ReaderConfig, StorageConfig } from "./config.schema";
 import { APP_CONFIG_NAMESPACE } from "./configuration";
 
 /**
@@ -35,5 +35,9 @@ export class AppConfigService {
 
   get reader(): ReaderConfig {
     return this.app.reader;
+  }
+
+  get storage(): StorageConfig {
+    return this.app.storage;
   }
 }

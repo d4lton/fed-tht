@@ -20,6 +20,8 @@ export interface AppConfig {
   database: DatabaseConfig;
   /** The label reader (AI provider) settings. */
   reader: ReaderConfig;
+  /** Where label images are kept (behind the storage swap point). */
+  storage: StorageConfig;
 }
 
 /**
@@ -51,6 +53,19 @@ export interface ReaderConfig {
 }
 
 /**
+ * The image storage swap point. In development images live in a folder on disk;
+ * in production they live in Google's file storage. Which one is in use is this
+ * config choice — the record stores only a reference either way.
+ */
+export interface StorageConfig {
+  imageStore: "disk" | "gcs";
+  /** Folder for the disk image store. */
+  dir: string;
+  /** Bucket name for the GCS image store (unused by disk). */
+  bucket: string;
+}
+
+/**
  * Validated at startup so a missing or malformed setting fails when the
  * service boots, not mid-request.
  */
@@ -72,5 +87,10 @@ export const configSchema = Joi.object<AppConfig>({
     // at call time if it is actually used without one.
     apiKey: Joi.string().allow("").required(),
     timeoutMs: Joi.number().integer().min(1).required()
+  }).required(),
+  storage: Joi.object<StorageConfig>({
+    imageStore: Joi.string().valid("disk", "gcs").required(),
+    dir: Joi.string().allow("").required(),
+    bucket: Joi.string().allow("").required()
   }).required()
 });

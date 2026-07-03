@@ -29,6 +29,11 @@ export function loadGcpConfig(): unknown {
       model: process.env.READER_MODEL ?? "claude-haiku-4-5",
       apiKey: process.env.ANTHROPIC_API_KEY,
       timeoutMs: process.env.READER_TIMEOUT_MS ? Number(process.env.READER_TIMEOUT_MS) : 5000
+    },
+    storage: {
+      imageStore: "gcs",
+      dir: "",
+      bucket: process.env.GCS_BUCKET
     }
   };
 }

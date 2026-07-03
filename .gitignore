@@ -6,6 +6,9 @@
 /coverage
 *.tsbuildinfo
 
+# Local image storage (disk image store)
+/var
+
 # Logs
 *.log
 npm-debug.log*

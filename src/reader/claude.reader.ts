@@ -121,13 +121,20 @@ function buildUserPrompt(type: DrinkType, lookFor: ThingsToLookFor): string {
 
 // --- image loading --------------------------------------------------------
 
-function loadImage(image: LabelImage): { bytes: Buffer; mediaType: string } {
+function loadImage(image: LabelImage): { bytes: Uint8Array; mediaType: string } {
+  // Prefer bytes handed in by the storage load step over reading a file.
+  if (image.data) {
+    return {
+      bytes: image.data,
+      mediaType: image.mediaType ?? "application/octet-stream"
+    };
+  }
   if (!image.source) {
-    throw new Error(`label "${image.label}" has no image source to read`);
+    throw new Error(`label "${image.label}" has no image bytes or source to read`);
   }
   return {
     bytes: readFileSync(image.source),
-    mediaType: mediaTypeFor(image.source)
+    mediaType: image.mediaType ?? mediaTypeFor(image.source)
   };
 }
 

@@ -23,10 +23,20 @@ export interface LabelImage {
   /** Which label this is (front/back/neck) — carried through to the report. */
   label: string;
   /**
-   * Where the image bytes live. Opaque to the pipeline; only a real reader
-   * interprets it. The stand-in ignores it.
+   * A file path to the image bytes. Used when reading images straight from
+   * files (e.g. the reading tests). Only a real reader interprets it; the
+   * stand-in ignores it.
    */
   source?: string;
+  /**
+   * The image bytes themselves. This is how the storage swap point hands images
+   * to the reader — the "load the application" step resolves each image
+   * reference to bytes, so the reader never touches the storage itself. Takes
+   * precedence over `source` when present.
+   */
+  data?: Uint8Array;
+  /** Media type for `data` (e.g. "image/png"); inferred from `source` otherwise. */
+  mediaType?: string;
 }
 
 /**
