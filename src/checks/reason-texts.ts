@@ -24,5 +24,6 @@ export const REASON_TEXTS: Record<string, string> = {
   "class-type-invalid": "The class/type is not a recognized legal designation.",
   "class-type-unconfirmed": "The class/type is a specialty designation that needs a person to confirm.",
   "class-type-conflict": "Two labels show a different class/type designation.",
-  "country-of-origin-missing": "An imported product must show a country of origin, and none was found."
+  "country-of-origin-missing": "An imported product must show a country of origin, and none was found.",
+  "country-of-origin-conflict": "Two labels show a different country of origin."
 };
