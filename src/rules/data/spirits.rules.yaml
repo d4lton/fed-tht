@@ -1,0 +1,79 @@
+# Distilled-spirits label rules, as declarative data (not code, not a DSL).
+# Each field carries three facets: what it is (shape), when it is required
+# (obligation), and how it is found (find-strategy). Nothing here says *where* a
+# field sits on the label — finding text anywhere on the image is the reader's job.
+#
+# find-strategy:
+#   from_expected  anchor to an application value (brand; name and address)
+#   fixed_text     anchor to a known legal string (the warning)
+#   from_list      anchor to the compiled designation list (class/type)
+#   by_format      confirm a properly-shaped statement is present (alcohol, net contents)
+#
+# required: `always`, or `{ when: <condition>, source: <label|application> }`.
+
+type: distilled-spirits
+fields:
+  - field: brand
+    find: from_expected
+    match: lenient
+    required: always
+    reasons:
+      missing: brand-missing
+      wrong: brand-wrong
+      conflict: brand-conflict
+
+  - field: name-and-address
+    find: from_expected
+    match: loose
+    required: always
+    reasons:
+      missing: name-address-missing
+      wrong: name-address-wrong
+      conflict: name-address-conflict
+
+  - field: warning
+    find: fixed_text
+    fixed_text: government-warning
+    required: always
+    reasons:
+      missing: warning-missing
+      wrong: warning-wrong
+      caps: warning-caps
+      unreadable: warning-unreadable
+      conflict: warning-conflict
+
+  - field: alcohol
+    find: by_format
+    format: alcohol
+    required: always
+    reasons:
+      missing: alcohol-missing
+      conflict: alcohol-conflict
+
+  - field: net-contents
+    find: by_format
+    format: net-contents
+    required: always
+    reasons:
+      missing: net-contents-missing
+      conflict: net-contents-conflict
+
+  - field: class-type
+    find: from_list
+    list: spirit-designations
+    required: always
+    reasons:
+      missing: class-type-missing
+      invalid: class-type-invalid
+      unconfirmed: class-type-unconfirmed
+      conflict: class-type-conflict
+
+  - field: country-of-origin
+    find: by_format
+    format: country-of-origin
+    required:
+      when: imported
+      source: application
+    reasons:
+      missing: country-of-origin-missing
+      conflict: country-of-origin-conflict

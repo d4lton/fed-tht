@@ -1,0 +1,49 @@
+# The compiled list of legal distilled-spirits designations (the standards of
+# identity classes and types, 27 CFR Part 5 subpart I). Each entry carries the
+# core terms the check looks for *inside* a label phrase — so "Kentucky Straight
+# Bourbon Whiskey" confirms via the core term "bourbon". Matching is word-based,
+# so a term never matches as a mere substring of another word.
+#
+# This is a bounded, prototype-sized list, not the full regulation. It covers
+# the common classes and the sub-kinds a spirits label is likely to bear.
+
+- designation: Whisky
+  core_terms: [whisky, whiskey]
+- designation: Bourbon Whiskey
+  core_terms: [bourbon whiskey, bourbon]
+- designation: Rye Whiskey
+  core_terms: [rye whiskey, rye]
+- designation: Rye Malt Whiskey
+  core_terms: [rye malt whiskey]
+- designation: Malt Whiskey
+  core_terms: [malt whiskey]
+- designation: Wheat Whiskey
+  core_terms: [wheat whiskey]
+- designation: Corn Whiskey
+  core_terms: [corn whiskey]
+- designation: Scotch Whisky
+  core_terms: [scotch whisky, scotch]
+- designation: Irish Whiskey
+  core_terms: [irish whiskey]
+- designation: Canadian Whisky
+  core_terms: [canadian whisky]
+- designation: Blended Whiskey
+  core_terms: [blended whiskey, blended whisky]
+- designation: Vodka
+  core_terms: [vodka]
+- designation: Gin
+  core_terms: [gin]
+- designation: Rum
+  core_terms: [rum]
+- designation: Brandy
+  core_terms: [brandy]
+- designation: Cognac
+  core_terms: [cognac]
+- designation: Tequila
+  core_terms: [tequila]
+- designation: Mezcal
+  core_terms: [mezcal]
+- designation: Liqueur
+  core_terms: [liqueur, cordial]
+- designation: Neutral Spirits
+  core_terms: [neutral spirits, grain neutral spirits]
