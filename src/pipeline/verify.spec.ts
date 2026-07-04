@@ -1,6 +1,6 @@
-import {DrinkType, ExpectedValues, LabelReadingReport} from "../core";
+import {DrinkType, ExpectedValues, FieldRead, LabelReadingReport} from "../core";
 import {GOVERNMENT_WARNING_TEXT, makeSpiritsRules} from "../core/validate/__fixtures__/spirits-rules.fixture";
-import {LabelImage, LabelReader, StandInReader, ThingsToLookFor} from "../reader";
+import {LabelImage, LabelReader, LlmFallback, RecheckInput, RereadInput, StandInReader, ThingsToLookFor} from "../reader";
 import {thingsToLookFor, verifyLabels} from "./verify";
 
 const TYPE: DrinkType = "distilled-spirits";
@@ -164,6 +164,93 @@ describe("verifyLabels — read → combine → judge through the reader slot", 
     }
   });
 });
+// --- the deterministic-first fallback -------------------------------------
+
+/** A fake fallback: records what it was asked, returns pre-set reads per move. */
+class FakeFallback implements LlmFallback {
+
+  lastRecheck?: RecheckInput;
+  lastReread?: RereadInput;
+
+  constructor(
+    private readonly recheckReads: FieldRead[] = [],
+    private readonly rereadReads: FieldRead[] = []
+  ) {}
+
+  recheck(input: RecheckInput): Promise<FieldRead[]> {
+    this.lastRecheck = input;
+    return Promise.resolve(this.recheckReads);
+  }
+
+  reread(input: RereadInput): Promise<FieldRead[]> {
+    this.lastReread = input;
+    return Promise.resolve(this.rereadReads);
+  }
+
+}
+
+/** A clean bourbon, but the fast pass missed net-contents; the OCR text has it. */
+function missedNetContents(): LabelReadingReport[] {
+  const reports = cleanBourbon();
+  reports[0].fields = reports[0].fields.filter((read) => read.field !== "net-contents");
+  reports[0].sourceText = "OLD TOM DISTILLERY\nKentucky Straight Bourbon Whiskey\n45% Alc./Vol.\nONE PINT NINE OUNCES";
+  reports[1].sourceText = GOVERNMENT_WARNING_TEXT;
+  return reports;
+}
+
+/** A clean bourbon, but the fast pass read the warning too poorly to judge. */
+function mangledWarning(): LabelReadingReport[] {
+  const reports = cleanBourbon();
+  const mangled = GOVERNMENT_WARNING_TEXT.replace("your ability", "yourability").replace("health problems", "healthproblem");
+  reports[1].fields = [{field: "warning", state: "found", text: mangled, basis: "confirmed"}];
+  return reports;
+}
+
+function runWith(reader: LabelReader, fallback: LlmFallback) {
+  return verifyLabels({images: IMAGES, type: TYPE, expected: EXPECTED, rules: RULES, reader, fallback, budgetMs: 5000});
+}
+
+describe("verifyLabels — deterministic-first LLM fallback", () => {
+  it("without a fallback, a field the fast pass missed simply fails", async () => {
+    const result = await verifyLabels({images: IMAGES, type: TYPE, expected: EXPECTED, rules: RULES, reader: new StandInReader(missedNetContents())});
+    expect(result.reasons.map((reason) => reason.id)).toContain("net-contents-missing");
+  });
+
+  it("rechecks the text to rescue a required field the fast pass missed, and passes", async () => {
+    const fallback = new FakeFallback([{field: "net-contents", state: "found", text: "One pint nine ounces", basis: "confirmed"}]);
+    const result = await runWith(new StandInReader(missedNetContents()), fallback);
+    expect(result.outcome).toBe("pass");
+    // Only the missing field was handed off; the OCR text went with it.
+    expect(fallback.lastRecheck?.fields).toEqual(["net-contents"]);
+    expect(fallback.lastRecheck?.text).toContain("ONE PINT NINE OUNCES");
+  });
+
+  it("re-reads the image to rescue a warning read too poorly to judge, and passes", async () => {
+    // Deterministic pass reads the warning as unreadable (a poor read).
+    const failing = await runWith(new StandInReader(mangledWarning()), new FakeFallback());
+    expect(failing.reasons.map((reason) => reason.id)).toContain("warning-unreadable");
+    // A vision re-read recovers the warning cleanly → passes.
+    const fallback = new FakeFallback([], [{field: "warning", state: "found", text: GOVERNMENT_WARNING_TEXT, basis: "confirmed"}]);
+    const result = await runWith(new StandInReader(mangledWarning()), fallback);
+    expect(result.outcome).toBe("pass");
+    expect(fallback.lastReread?.fields).toEqual(["warning"]);
+  });
+
+  it("leaves the failure in place when the fallback finds nothing", async () => {
+    const result = await runWith(new StandInReader(missedNetContents()), new FakeFallback());
+    expect(result.outcome).toBe("fail");
+    expect(result.reasons.map((reason) => reason.id)).toContain("net-contents-missing");
+  });
+
+  it("does not consult the fallback when the fast pass already passes", async () => {
+    const fallback = new FakeFallback();
+    const result = await runWith(new StandInReader(cleanBourbon()), fallback);
+    expect(result.outcome).toBe("pass");
+    expect(fallback.lastRecheck).toBeUndefined();
+    expect(fallback.lastReread).toBeUndefined();
+  });
+});
+
 describe("thingsToLookFor", () => {
   it("pulls the warning wording and designations from the rules", () => {
     const lookFor = thingsToLookFor(EXPECTED, RULES);

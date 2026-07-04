@@ -1,17 +1,12 @@
-# Distilled-spirits label rules, as declarative data (not code, not a DSL).
-# Each field carries three facets: what it is (shape), when it is required
-# (obligation), and how it is found (find-strategy). Nothing here says *where* a
-# field sits on the label — finding text anywhere on the image is the reader's job.
-#
-# find-strategy:
-#   from_expected  anchor to an application value (brand; name and address)
-#   fixed_text     anchor to a known legal string (the warning)
-#   from_list      anchor to the compiled designation list (class/type)
-#   by_format      confirm a properly-shaped statement is present (alcohol, net contents)
-#
-# required: `always`, or `{ when: <condition>, source: <label|application> }`.
+# Malt-beverage label rules, as declarative data (27 CFR Part 7). Same shape as
+# the distilled-spirits rules, differing in the class/type designation list and
+# in one obligation: alcohol content is NOT required. Under Part 7 an alcohol
+# statement is permitted but not federally mandated (some states require it), so
+# the field is omitted rather than modelled as always-required — a malt label
+# that leaves it off is still compliant. Nothing here says *where* a field sits
+# on the label; that is the reader's job.
 
-type: distilled-spirits
+type: malt-beverage
 fields:
   - field: brand
     find: from_expected
@@ -42,14 +37,6 @@ fields:
       unreadable: warning-unreadable
       conflict: warning-conflict
 
-  - field: alcohol
-    find: by_format
-    format: alcohol
-    required: always
-    reasons:
-      missing: alcohol-missing
-      conflict: alcohol-conflict
-
   - field: net-contents
     find: by_format
     format: net-contents
@@ -60,9 +47,9 @@ fields:
 
   - field: class-type
     find: from_list
-    list: spirit-designations
+    list: malt-designations
     # loose: one label reading a fragment of the other's designation (OCR breaks
-    # "Straight Rye Whisky" across lines) is not a disagreement.
+    # the phrase across lines) is not a disagreement.
     match: loose
     required: always
     reasons:

@@ -10,7 +10,7 @@
     "password": "fedtht_dev_pw"
   },
   "reader": {
-    "provider": "anthropic",
+    "provider": "google-vision",
     "model": "claude-haiku-4-5",
     "apiKey": "",
     "anthropicKeySecret": "projects/fed-tht/secrets/anthropicKeySecret/versions/latest",

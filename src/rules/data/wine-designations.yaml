@@ -1,0 +1,53 @@
+# The compiled list of legal wine class/type designations (27 CFR Part 4, the
+# standards of identity and the varietal names in common use). Each entry
+# carries the core terms the check looks for *inside* a label phrase — so "Napa
+# Valley Cabernet Sauvignon" confirms via the core term "cabernet". Matching is
+# word-based, so a term never matches as a mere substring of another word.
+#
+# A bounded, prototype-sized list, not the full regulation: the common class
+# designations plus the grape varietals a wine label most often bears.
+
+- designation: Table Wine
+  core_terms: [table wine]
+- designation: Red Wine
+  core_terms: [red wine]
+- designation: White Wine
+  core_terms: [white wine]
+- designation: Rosé Wine
+  core_terms: [rosé wine, rose wine]
+- designation: Sparkling Wine
+  core_terms: [sparkling wine]
+- designation: Champagne
+  core_terms: [champagne]
+- designation: Crackling Wine
+  core_terms: [crackling wine]
+- designation: Dessert Wine
+  core_terms: [dessert wine]
+- designation: Fruit Wine
+  core_terms: [fruit wine]
+- designation: Cabernet Sauvignon
+  core_terms: [cabernet sauvignon, cabernet]
+- designation: Merlot
+  core_terms: [merlot]
+- designation: Pinot Noir
+  core_terms: [pinot noir]
+- designation: Pinot Grigio
+  core_terms: [pinot grigio, pinot gris]
+- designation: Chardonnay
+  core_terms: [chardonnay]
+- designation: Sauvignon Blanc
+  core_terms: [sauvignon blanc]
+- designation: Riesling
+  core_terms: [riesling]
+- designation: Zinfandel
+  core_terms: [zinfandel]
+- designation: Syrah
+  core_terms: [syrah, shiraz]
+- designation: Malbec
+  core_terms: [malbec]
+- designation: Port
+  core_terms: [port]
+- designation: Sherry
+  core_terms: [sherry]
+- designation: Vermouth
+  core_terms: [vermouth]

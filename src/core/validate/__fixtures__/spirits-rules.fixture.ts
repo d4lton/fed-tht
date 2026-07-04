@@ -75,6 +75,7 @@ export function makeSpiritsRules(): RulesForType {
       {
         field: "class-type",
         find: "from_list",
+        match: "loose",
         designations: [
           {designation: "Whisky", coreTerms: ["whisky", "whiskey"]},
           {

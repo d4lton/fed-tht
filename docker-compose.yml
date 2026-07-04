@@ -67,8 +67,15 @@ services:
       # `gcloud auth application-default login`. Never baked into the image or
       # shipped to production.
       - ${HOME}/.config/gcloud/application_default_credentials.json:/gcloud/application_default_credentials.json:ro
+      # Keep the local (disk) image store on a named volume so uploaded images
+      # survive a container rebuild — the same way the Postgres data does.
+      # Without this, `app:up` wipes every image while the records persist,
+      # leaving applications pointing at files that are gone. Production stores
+      # images in GCS, not here.
+      - fed-tht-images:/app/var/images
     ports:
       - '3000:3000'
 
 volumes:
   fed-tht-pgdata:
+  fed-tht-images:

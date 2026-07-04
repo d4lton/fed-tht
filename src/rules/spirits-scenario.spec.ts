@@ -117,12 +117,15 @@ describe("a mangled bourbon", () => {
       },
       {
         label: "back",
-        // warning present but a word changed
+        // warning present but substantially wrong wording
         fields: [
           {
             field: "warning",
             state: "found",
-            text: GOVERNMENT_WARNING_TEXT.replace("birth defects", "birth defect"),
+            text: GOVERNMENT_WARNING_TEXT.replace(
+              "impairs your ability to drive a car or operate machinery, and may cause health problems.",
+              "is a great way to relax and unwind after a long day."
+            ),
             basis: "confirmed"
           }
         ]

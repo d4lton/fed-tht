@@ -1,0 +1,39 @@
+# The compiled list of legal malt-beverage class/type designations (27 CFR
+# Part 7). Each entry carries the core terms the check looks for *inside* a label
+# phrase — so "West Coast India Pale Ale" confirms via "india pale ale" (or
+# "ale"). Matching is word-based, so a term never matches as a mere substring of
+# another word.
+#
+# A bounded, prototype-sized list, not the full regulation: the common class
+# designations and beer styles a malt-beverage label most often bears.
+
+- designation: Beer
+  core_terms: [beer]
+- designation: Ale
+  core_terms: [ale]
+- designation: Lager
+  core_terms: [lager]
+- designation: Pilsner
+  core_terms: [pilsner, pilsener]
+- designation: India Pale Ale
+  core_terms: [india pale ale, ipa]
+- designation: Pale Ale
+  core_terms: [pale ale]
+- designation: Stout
+  core_terms: [stout]
+- designation: Porter
+  core_terms: [porter]
+- designation: Wheat Beer
+  core_terms: [wheat beer, hefeweizen, witbier]
+- designation: Amber Ale
+  core_terms: [amber ale]
+- designation: Brown Ale
+  core_terms: [brown ale]
+- designation: Bock
+  core_terms: [bock]
+- designation: Saison
+  core_terms: [saison]
+- designation: Barley Wine
+  core_terms: [barley wine, barleywine]
+- designation: Malt Liquor
+  core_terms: [malt liquor]

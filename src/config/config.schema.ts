@@ -48,8 +48,13 @@ export interface DatabaseConfig {
  * provider can add its own pointer alongside without ambiguity.
  */
 export interface ReaderConfig {
-  provider: "anthropic";
-  /** Model id, e.g. `claude-haiku-4-5`. */
+  /**
+   * Which reader fills the slot: `google-vision` (fast OCR + in-code extraction,
+   * the default, chosen to meet the hard latency budget) or `anthropic` (the
+   * model reader — higher reading quality, but latency it can't bound).
+   */
+  provider: "google-vision" | "anthropic";
+  /** Model id for the `anthropic` reader, e.g. `claude-haiku-4-5`. */
   model: string;
   /**
    * The resolved key for the configured provider, filled in at boot from Secret
@@ -106,7 +111,7 @@ export const configSchema = Joi.object<AppConfig>({
     password: Joi.string().required()
   }).required(),
   reader: Joi.object<ReaderConfig>({
-    provider: Joi.string().valid("anthropic").required(),
+    provider: Joi.string().valid("google-vision", "anthropic").required(),
     model: Joi.string().min(1).required(),
     // Empty is allowed so dev/test boot without a key; the reader fails clearly
     // at call time if it is actually used without one.

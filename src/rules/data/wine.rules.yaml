@@ -1,17 +1,13 @@
-# Distilled-spirits label rules, as declarative data (not code, not a DSL).
-# Each field carries three facets: what it is (shape), when it is required
-# (obligation), and how it is found (find-strategy). Nothing here says *where* a
-# field sits on the label — finding text anywhere on the image is the reader's job.
+# Wine label rules, as declarative data (27 CFR Part 4). Same shape as the
+# distilled-spirits rules — every field carries what it is, when it is required,
+# and how it is found — differing only in the class/type designation list.
+# Nothing here says *where* a field sits on the label; that is the reader's job.
 #
-# find-strategy:
-#   from_expected  anchor to an application value (brand; name and address)
-#   fixed_text     anchor to a known legal string (the warning)
-#   from_list      anchor to the compiled designation list (class/type)
-#   by_format      confirm a properly-shaped statement is present (alcohol, net contents)
-#
-# required: `always`, or `{ when: <condition>, source: <label|application> }`.
+# Simplifications for the prototype, called out honestly: the sulfite
+# declaration ("CONTAINS SULFITES") and appellation of origin are not modelled —
+# they would need fields beyond the shared vocabulary.
 
-type: distilled-spirits
+type: wine
 fields:
   - field: brand
     find: from_expected
@@ -60,9 +56,9 @@ fields:
 
   - field: class-type
     find: from_list
-    list: spirit-designations
+    list: wine-designations
     # loose: one label reading a fragment of the other's designation (OCR breaks
-    # "Straight Rye Whisky" across lines) is not a disagreement.
+    # the phrase across lines) is not a disagreement.
     match: loose
     required: always
     reasons:

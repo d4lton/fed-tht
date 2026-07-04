@@ -48,4 +48,10 @@ export interface LabelReadingReport {
   fields: FieldRead[];
   /** General observations not about one field ("the whole image is dark"). Optional. */
   notes?: string[];
+  /**
+   * The raw text the reader read off this label, when it has it (an OCR reader
+   * does; a model reader may not). Not used by combine or judge — it is here so a
+   * fallback pass can re-examine the same text without re-reading the image.
+   */
+  sourceText?: string;
 }

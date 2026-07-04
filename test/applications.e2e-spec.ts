@@ -1,9 +1,10 @@
 import {Server} from "http";
-import {INestApplication} from "@nestjs/common";
+import {NestExpressApplication} from "@nestjs/platform-express";
 import {Test, TestingModule} from "@nestjs/testing";
 import request from "supertest";
 import {AppModule} from "../src/app.module";
 import {DrinkType, LabelReadingReport} from "../src/core";
+import {configureBodyParser} from "../src/http-config";
 import {LABEL_READER, LabelImage, LabelReader} from "../src/reader";
 import {GOVERNMENT_WARNING_TEXT} from "../src/core/validate/__fixtures__/spirits-rules.fixture";
 
@@ -67,7 +68,7 @@ interface ApplicationBody {
 }
 
 describe("Applications (e2e)", () => {
-  let app: INestApplication;
+  let app: NestExpressApplication;
   let server: Server;
   const reader = new FakeReader();
   let id: string;
@@ -78,9 +79,12 @@ describe("Applications (e2e)", () => {
       .overrideProvider(LABEL_READER)
       .useValue(reader)
       .compile();
-    app = moduleRef.createNestApplication();
+    // Build the app the same way bootstrap does — bodyParser off, then the
+    // raised limit applied — so the request-size behaviour under test is real.
+    app = moduleRef.createNestApplication<NestExpressApplication>({bodyParser: false});
+    configureBodyParser(app);
     await app.init();
-    server = app.getHttpServer() as Server;
+    server = app.getHttpServer();
   });
   afterAll(async () => {
     await app.close();
@@ -126,6 +130,32 @@ describe("Applications (e2e)", () => {
     expect(body.result?.outcome).toBe("pass");
     expect(body.result?.reasons).toEqual([]);
     expect(body.images.map((i) => i.label).sort()).toEqual(["back", "front"]);
+  });
+  it("accepts an image body larger than the framework's default 100kb JSON limit", async () => {
+    reader.setReads(CLEAN_READS);
+    const created = await request(server)
+      .post("/applications")
+      .send({
+        drinkType: "distilled-spirits",
+        brand: "Old Tom Distillery",
+        nameAndAddress: "Old Tom Distillery, Bardstown, KY",
+        importedOrDomestic: "domestic"
+      })
+      .expect(201);
+    const bigId = (created.body as ApplicationBody).id;
+    // ~150KB in one field — over the default 100kb limit, so this returns 413
+    // unless the raised body limit is applied.
+    const bigData = "A".repeat(150 * 1024);
+    const res = await request(server)
+      .put(`/applications/${bigId}/images`)
+      .send({
+        images: [
+          {label: "front", data: bigData, mediaType: "image/png"},
+          {label: "back", data: pngBase64, mediaType: "image/png"}
+        ]
+      })
+      .expect(200);
+    expect((res.body as ApplicationBody).result?.outcome).toBe("pass");
   });
   it("returns everything on file for one application: its fields, images, and result", async () => {
     const res = await request(server).get(`/applications/${id}`).expect(200);

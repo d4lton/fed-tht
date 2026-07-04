@@ -125,15 +125,31 @@ describe("warning", () => {
     removeField(reports, "back", "warning");
     expect(ids(run(reports))).toContain("warning-missing");
   });
-  it("fails warning-wrong: a word is changed", () => {
+  it("fails warning-wrong: a substantially different warning", () => {
     const reports = validReports();
     setRead(reports, "back", {
       field: "warning",
       state: "found",
-      text: GOVERNMENT_WARNING_TEXT.replace("birth defects", "birth defect"),
+      text: GOVERNMENT_WARNING_TEXT.replace(
+        "impairs your ability to drive a car or operate machinery, and may cause health problems.",
+        "is a great way to relax and unwind after a long day."
+      ),
       basis: "confirmed"
     });
     expect(ids(run(reports))).toContain("warning-wrong");
+  });
+  it("fails warning-unreadable: a close-but-mangled read (poor quality), not warning-wrong", () => {
+    const reports = validReports();
+    setRead(reports, "back", {
+      field: "warning",
+      state: "found",
+      // Sideways/low-quality OCR: words run together, a letter dropped.
+      text: GOVERNMENT_WARNING_TEXT.replace("your ability", "yourability").replace("birth defects", "birthdefect"),
+      basis: "confirmed"
+    });
+    const result = run(reports);
+    expect(ids(result)).toContain("warning-unreadable");
+    expect(ids(result)).not.toContain("warning-wrong");
   });
   it("fails warning-caps: right words but GOVERNMENT WARNING not capitalized", () => {
     const reports = validReports();
@@ -337,6 +353,21 @@ describe("labels agreeing", () => {
     expect(ids(result)).toContain("brand-conflict");
     // The front still matches the expected brand, so it is not also "wrong".
     expect(ids(result)).not.toContain("brand-wrong");
+  });
+  it("no class-type-conflict when one label reads a fragment of the other's designation", () => {
+    const reports = validReports();
+    // OCR broke "Straight Rye Whisky" across lines on one label, not the other.
+    setRead(reports, "front", {field: "class-type", state: "found", text: "Straight Rye", basis: "confirmed"});
+    setRead(reports, "back", {field: "class-type", state: "found", text: "Straight Rye Whisky", basis: "confirmed"});
+    const result = run(reports);
+    expect(ids(result)).not.toContain("class-type-conflict");
+    expect(result.outcome).toBe("pass");
+  });
+  it("fails class-type-conflict when the labels name genuinely different designations", () => {
+    const reports = validReports();
+    setRead(reports, "front", {field: "class-type", state: "found", text: "Bourbon Whiskey", basis: "confirmed"});
+    setRead(reports, "back", {field: "class-type", state: "found", text: "Rye Whiskey", basis: "confirmed"});
+    expect(ids(run(reports))).toContain("class-type-conflict");
   });
   it("passes when the labels are consistent", () => {
     expect(run(validReports()).outcome).toBe("pass");

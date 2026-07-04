@@ -1,6 +1,6 @@
 import {normalizedText} from "../core";
 import {GOVERNMENT_WARNING_TEXT} from "../core/validate/__fixtures__/spirits-rules.fixture";
-import {RuleResources, buildRulesForType, loadSpiritsRules} from "./rules-loader";
+import {RuleResources, buildRulesForType, loadMaltRules, loadSpiritsRules, loadWineRules} from "./rules-loader";
 
 describe("loadSpiritsRules (from the YAML data files)", () => {
   const rules = loadSpiritsRules();
@@ -34,6 +34,32 @@ describe("loadSpiritsRules (from the YAML data files)", () => {
       tag: "imported",
       source: "application"
     });
+  });
+});
+describe("loadWineRules (from the YAML data files)", () => {
+  const rules = loadWineRules();
+  it("loads the wine rules with the same shared warning", () => {
+    expect(rules.type).toBe("wine");
+    const warning = rules.fields.find((rule) => rule.field === "warning");
+    expect(normalizedText(warning?.fixedText?.text ?? "")).toBe(normalizedText(GOVERNMENT_WARNING_TEXT));
+  });
+  it("resolves wine designations, not spirits ones", () => {
+    const classType = rules.fields.find((rule) => rule.field === "class-type");
+    const cabernet = classType?.designations?.find((designation) => designation.designation === "Cabernet Sauvignon");
+    expect(cabernet?.coreTerms).toContain("cabernet");
+  });
+});
+describe("loadMaltRules (from the YAML data files)", () => {
+  const rules = loadMaltRules();
+  it("loads the malt-beverage rules", () => {
+    expect(rules.type).toBe("malt-beverage");
+    const ipa = rules.fields
+      .find((rule) => rule.field === "class-type")
+      ?.designations?.find((designation) => designation.designation === "India Pale Ale");
+    expect(ipa?.coreTerms).toContain("ipa");
+  });
+  it("does not require alcohol content (permitted, not mandated for malt)", () => {
+    expect(rules.fields.map((rule) => rule.field)).not.toContain("alcohol");
   });
 });
 describe("buildRulesForType — checked on load", () => {

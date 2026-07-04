@@ -41,6 +41,30 @@ export function containsPhrase(haystack: string, needle: string): boolean {
   return false;
 }
 
+/**
+ * True when `needle`'s words all appear, in order, within `haystack`'s words —
+ * gaps allowed. Looser than {@link containsPhrase}: for a value the label splits
+ * across its design, like a producer name at the top and its city/state at the
+ * bottom with unrelated text (a class/type, tasting notes) in between.
+ */
+export function containsSubsequence(haystack: string, needle: string): boolean {
+  const haystackWords = words(haystack);
+  const needleWords = words(needle);
+  if (needleWords.length === 0) {
+    return false;
+  }
+  let next = 0;
+  for (const word of haystackWords) {
+    if (word === needleWords[next]) {
+      next++;
+      if (next === needleWords.length) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
 /** Equal ignoring case and punctuation (the lenient brand comparison). */
 export function equalsLenient(a: string, b: string): boolean {
   return normalizedText(a) === normalizedText(b);

@@ -38,12 +38,18 @@ export function ResultView({
               <div>
                 <Tag color="red">{reason.id}</Tag>
                 <span>{reasonTexts[reason.id] ?? reason.id}</span>
-                {reason.expected !== undefined && (
+                {reason.expected !== undefined ? (
                   <div>
                     <Typography.Text type="secondary">
                       expected “{reason.expected}”, found “{reason.found}”
                     </Typography.Text>
                   </div>
+                ) : (
+                  reason.found !== undefined && (
+                    <div>
+                      <Typography.Text type="secondary">read: “{reason.found}”</Typography.Text>
+                    </div>
+                  )
                 )}
                 {reason.labels.length > 0 && (
                   <div>

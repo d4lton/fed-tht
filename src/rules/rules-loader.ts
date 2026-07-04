@@ -193,13 +193,32 @@ function loadDesignations(file: string): Designation[] {
   }));
 }
 
-/** Load and check the distilled-spirits rules from the YAML data files. */
-export function loadSpiritsRules(): RulesForType {
+/**
+ * Load and check one drink type's rules from its YAML data files: the rules
+ * file, plus the government warning and the type's designation list it points
+ * at. The warning is shared across types; the designation list is per type.
+ */
+function loadRules(rulesFile: string, listName: string, designationsFile: string): RulesForType {
   const warning = loadFixedText("government-warning.yaml");
-  const designations = loadDesignations("spirit-designations.yaml");
+  const designations = loadDesignations(designationsFile);
   const resources: RuleResources = {
     fixedTexts: {[warning.id]: warning},
-    lists: {"spirit-designations": designations}
+    lists: {[listName]: designations}
   };
-  return buildRulesForType(loadYamlFile("spirits.rules.yaml"), resources, "spirits.rules.yaml");
+  return buildRulesForType(loadYamlFile(rulesFile), resources, rulesFile);
+}
+
+/** Load and check the distilled-spirits rules from the YAML data files. */
+export function loadSpiritsRules(): RulesForType {
+  return loadRules("spirits.rules.yaml", "spirit-designations", "spirit-designations.yaml");
+}
+
+/** Load and check the wine rules from the YAML data files. */
+export function loadWineRules(): RulesForType {
+  return loadRules("wine.rules.yaml", "wine-designations", "wine-designations.yaml");
+}
+
+/** Load and check the malt-beverage rules from the YAML data files. */
+export function loadMaltRules(): RulesForType {
+  return loadRules("malt.rules.yaml", "malt-designations", "malt-designations.yaml");
 }

@@ -1,11 +1,18 @@
 import {Inject, Injectable} from "@nestjs/common";
 import {DrinkType, ExpectedValues, OriginStatus} from "../core";
 import {verifyLabels} from "../pipeline/verify";
-import {LABEL_READER, LabelImage, LabelReader} from "../reader";
+import {LABEL_READER, LabelImage, LabelReader, LLM_FALLBACK, LlmFallback} from "../reader";
 import {RulesProvider} from "../rules/rules.provider";
 import {IMAGE_STORE, ImageStore} from "../storage/image-store/image-store";
 import {CheckResult} from "./check-result";
 import {ChecksLogStore} from "./checks-log.store";
+
+/**
+ * The whole validation's time budget. The fast OCR path finishes far inside it;
+ * it exists to bound the deterministic-first fallback so a would-be failure that
+ * hands off to the model can't blow past it.
+ */
+const VALIDATION_BUDGET_MS = 5000;
 
 /** What the checker needs about an application to run a check on it. */
 export interface CheckInput {
@@ -30,6 +37,7 @@ export class CheckService {
   constructor(
     @Inject(LABEL_READER) private readonly reader: LabelReader,
     @Inject(IMAGE_STORE) private readonly imageStore: ImageStore,
+    @Inject(LLM_FALLBACK) private readonly fallback: LlmFallback,
     private readonly rules: RulesProvider,
     private readonly log: ChecksLogStore
   ) {}
@@ -53,7 +61,9 @@ export class CheckService {
       expected,
       rules: this.rules.forType(input.type),
       reader: this.reader,
-      application: input.application
+      application: input.application,
+      fallback: this.fallback,
+      budgetMs: VALIDATION_BUDGET_MS
     });
     const tookMs = Date.now() - start;
     const result: CheckResult = {

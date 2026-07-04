@@ -29,6 +29,11 @@ RUN npm ci --omit=dev && npm cache clean --force
 COPY --from=builder /app/dist ./dist
 COPY config ./config
 
+# The local (disk) image store writes under ./var; create it owned by the
+# unprivileged user so the non-root process can write. Production stores images
+# in GCS, not here — this only matters when the app runs locally in Compose.
+RUN mkdir -p /app/var/images && chown -R node:node /app/var
+
 # Run as the unprivileged built-in `node` user, not root.
 USER node
 

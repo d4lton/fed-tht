@@ -178,6 +178,7 @@ function judgeFixedText(rule: FieldRule, agg: AggregatedField | undefined): Reas
   }
   let sawWrongWords = false;
   let sawBadCaps = false;
+  let sawUnreadable = false;
   for (const observation of found) {
     const verdict = checkWarning(observation.text ?? "", fixed);
     if (verdict === "ok") {
@@ -186,15 +187,23 @@ function judgeFixedText(rule: FieldRule, agg: AggregatedField | undefined): Reas
     }
     if (verdict === "wrong-words") {
       sawWrongWords = true;
+    } else if (verdict === "unreadable") {
+      sawUnreadable = true;
     } else {
       sawBadCaps = true;
     }
   }
+  // Carry the text that was read so a failure can show what it saw, not just
+  // that it was wrong (the expected wording is the known fixed string). A
+  // genuinely wrong warning takes precedence over a merely-unreadable one.
   if (sawWrongWords && rule.reasons.wrong) {
-    return [{id: rule.reasons.wrong, labels: labelsOf(found)}];
+    return [{id: rule.reasons.wrong, labels: labelsOf(found), found: found[0].text ?? ""}];
+  }
+  if (sawUnreadable && rule.reasons.unreadable) {
+    return [{id: rule.reasons.unreadable, labels: labelsOf(found), found: found[0].text ?? ""}];
   }
   if (sawBadCaps && rule.reasons.caps) {
-    return [{id: rule.reasons.caps, labels: labelsOf(found)}];
+    return [{id: rule.reasons.caps, labels: labelsOf(found), found: found[0].text ?? ""}];
   }
   return [];
 }
