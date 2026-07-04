@@ -22,6 +22,8 @@ export interface AppConfig {
   reader: ReaderConfig;
   /** Where label images are kept (behind the storage swap point). */
   storage: StorageConfig;
+  /** Cross-origin settings so the separate frontend app can call the backend. */
+  cors: CorsConfig;
 }
 
 /**
@@ -38,16 +40,29 @@ export interface DatabaseConfig {
 
 /**
  * The real reader's model settings. The provider is a config choice so the
- * reader can be swapped. The API key comes from local config in development and
- * from GCP in production — never committed. In dev it is supplied via the
- * `ANTHROPIC_API_KEY` env var (config.local.json holds an empty default), so a
- * real key stays out of the repo.
+ * reader can be swapped. The API key is never committed and never read from the
+ * environment: it is fetched at boot from GCP Secret Manager — in every
+ * environment — using the non-sensitive secret reference below. If the fetch is
+ * skipped or fails, `apiKey` stays empty and the reader fails clearly at call
+ * time. The reference is provider-named (`anthropicKeySecret`) so a second AI
+ * provider can add its own pointer alongside without ambiguity.
  */
 export interface ReaderConfig {
   provider: "anthropic";
   /** Model id, e.g. `claude-haiku-4-5`. */
   model: string;
+  /**
+   * The resolved key for the configured provider, filled in at boot from Secret
+   * Manager. Empty until then (and if the fetch is skipped or fails). Not stored
+   * in any config file.
+   */
   apiKey: string;
+  /**
+   * The Secret Manager resource holding the Anthropic key, e.g.
+   * `projects/<project>/secrets/<name>/versions/latest`. Non-sensitive — it is
+   * only a pointer, so it lives in config. Empty disables the fetch.
+   */
+  anthropicKeySecret: string;
   /** How long to wait for the model before failing the read. */
   timeoutMs: number;
 }
@@ -63,6 +78,16 @@ export interface StorageConfig {
   dir: string;
   /** Bucket name for the GCS image store (unused by disk). */
   bucket: string;
+}
+
+/**
+ * The frontend is a separate app at its own web address, so the browser blocks
+ * its requests unless the backend says that address is allowed (CORS). These are
+ * the origins allowed to call the API — the frontend's address, plus the local
+ * dev address.
+ */
+export interface CorsConfig {
+  origins: string[];
 }
 
 /**
@@ -86,11 +111,16 @@ export const configSchema = Joi.object<AppConfig>({
     // Empty is allowed so dev/test boot without a key; the reader fails clearly
     // at call time if it is actually used without one.
     apiKey: Joi.string().allow("").required(),
+    // The Anthropic Secret Manager pointer (non-sensitive). Empty disables it.
+    anthropicKeySecret: Joi.string().allow("").required(),
     timeoutMs: Joi.number().integer().min(1).required()
   }).required(),
   storage: Joi.object<StorageConfig>({
     imageStore: Joi.string().valid("disk", "gcs").required(),
     dir: Joi.string().allow("").required(),
     bucket: Joi.string().allow("").required()
+  }).required(),
+  cors: Joi.object<CorsConfig>({
+    origins: Joi.array().items(Joi.string()).required()
   }).required()
 });

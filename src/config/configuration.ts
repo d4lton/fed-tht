@@ -24,6 +24,8 @@ export function resolveEnv(): AppEnv {
   }
 }
 
+// Loaders may be sync (test reads a file) or async (local/prod may fetch
+// secrets); `loadConfiguration` awaits the result either way.
 const loaders: Record<AppEnv, () => unknown> = {
   local: loadLocalConfig,
   test: loadTestConfig,
@@ -39,9 +41,9 @@ const loaders: Record<AppEnv, () => unknown> = {
  * Callers never see which source produced the values; the source is swappable
  * behind this loader, the same idea as the swappable label reader.
  */
-export function loadConfiguration(): { [APP_CONFIG_NAMESPACE]: AppConfig } {
+export async function loadConfiguration(): Promise<{ [APP_CONFIG_NAMESPACE]: AppConfig }> {
   const env = resolveEnv();
-  const raw = loaders[env]();
+  const raw = await loaders[env]();
   const result: Joi.ValidationResult<AppConfig> = configSchema.validate(raw, {
     abortEarly: false,
     convert: true

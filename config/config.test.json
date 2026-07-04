@@ -13,11 +13,15 @@
     "provider": "anthropic",
     "model": "claude-haiku-4-5",
     "apiKey": "",
+    "anthropicKeySecret": "",
     "timeoutMs": 5000
   },
   "storage": {
     "imageStore": "disk",
     "dir": "./var/images-test",
     "bucket": ""
+  },
+  "cors": {
+    "origins": ["http://localhost:5173"]
   }
 }

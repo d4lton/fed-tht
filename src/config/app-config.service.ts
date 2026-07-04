@@ -1,6 +1,6 @@
 import {Injectable} from "@nestjs/common";
 import {ConfigService} from "@nestjs/config";
-import {AppConfig, DatabaseConfig, ReaderConfig, StorageConfig} from "./config.schema";
+import {AppConfig, CorsConfig, DatabaseConfig, ReaderConfig, StorageConfig} from "./config.schema";
 import {APP_CONFIG_NAMESPACE} from "./configuration";
 
 /**
@@ -40,6 +40,10 @@ export class AppConfigService {
 
   get storage(): StorageConfig {
     return this.app.storage;
+  }
+
+  get cors(): CorsConfig {
+    return this.app.cors;
   }
 
 }

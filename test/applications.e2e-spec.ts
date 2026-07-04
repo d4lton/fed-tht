@@ -134,6 +134,14 @@ describe("Applications (e2e)", () => {
     expect(body.images).toHaveLength(2);
     expect(body.result?.outcome).toBe("pass");
   });
+  it("serves a label image's bytes", async () => {
+    const res = await request(server).get(`/applications/${id}/images/front`).buffer(true).expect(200);
+    expect(res.headers["content-type"]).toContain("image/png");
+    expect(Buffer.from(res.body as Buffer)).toEqual(Buffer.from([1, 2, 3, 4]));
+  });
+  it("returns 404 for a missing image label", async () => {
+    await request(server).get(`/applications/${id}/images/neck`).expect(404);
+  });
   it("returns 404 for an application that is not there", async () => {
     await request(server).get("/applications/00000000-0000-0000-0000-000000000000").expect(404);
   });

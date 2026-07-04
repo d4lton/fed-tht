@@ -1,5 +1,6 @@
 import {readFileSync} from "fs";
 import {join} from "path";
+import {resolveReaderApiKey} from "../secrets/secret-manager";
 
 /**
  * Local-dev config source: reads `config/config.local.json` from the project
@@ -11,12 +12,16 @@ import {join} from "path";
  * the on-machine defaults; the Compose app service supplies the in-Compose
  * address via `DB_HOST` (and friends), applied as overrides here. Both sets are
  * local configuration — production credentials still come only from GCP.
+ *
+ * The reader's API key is not in the file and not read from the environment: it
+ * is fetched from GCP Secret Manager using the non-sensitive `anthropicKeySecret`
+ * pointer, the same as production (see {@link resolveReaderApiKey}).
  */
-export function loadLocalConfig(): unknown {
+export async function loadLocalConfig(): Promise<unknown> {
   const path = join(process.cwd(), "config", "config.local.json");
   const config = JSON.parse(readFileSync(path, "utf8")) as Record<string, unknown>;
   config.database = applyDatabaseEnvOverrides(config.database);
-  config.reader = applyReaderEnvOverrides(config.reader);
+  config.reader = await resolveReaderApiKey(applyReaderModelOverride(config.reader));
   return config;
 }
 
@@ -44,18 +49,15 @@ function applyDatabaseEnvOverrides(existing: unknown): Record<string, unknown> {
 }
 
 /**
- * The real reader's key stays out of the repo: `config.local.json` holds an
- * empty default, and a real key is supplied via `ANTHROPIC_API_KEY` (with an
- * optional `READER_MODEL` override), applied here.
+ * The reader's key is never read from the environment — only the model, a
+ * non-sensitive convenience override for trying a different model locally. The
+ * key comes from Secret Manager via {@link resolveReaderApiKey}.
  */
-function applyReaderEnvOverrides(existing: unknown): Record<string, unknown> {
+function applyReaderModelOverride(existing: unknown): Record<string, unknown> {
   const reader: Record<string, unknown> = {
     ...(existing as Record<string, unknown> | undefined)
   };
   const env = process.env;
-  if (env.ANTHROPIC_API_KEY) {
-    reader.apiKey = env.ANTHROPIC_API_KEY;
-  }
   if (env.READER_MODEL) {
     reader.model = env.READER_MODEL;
   }

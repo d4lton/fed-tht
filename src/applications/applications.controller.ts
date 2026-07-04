@@ -1,4 +1,5 @@
-import {Body, Controller, Get, Param, Patch, Post, Put} from "@nestjs/common";
+import {Body, Controller, Get, Param, Patch, Post, Put, Res} from "@nestjs/common";
+import type {Response} from "express";
 import {ApplicationsService} from "./applications.service";
 import {ApplicationSummary, ApplicationView} from "./application-view";
 import {CreateApplicationDto, UpdateDetailsDto, UpdateImagesDto} from "./application.dto";
@@ -28,6 +29,14 @@ export class ApplicationsController {
   @Get(":id")
   get(@Param("id") id: string): Promise<ApplicationView> {
     return this.applications.get(id);
+  }
+
+  /** Serve one label image's bytes, so the detail screen can show it. */
+  @Get(":id/images/:label")
+  async image(@Param("id") id: string, @Param("label") label: string, @Res() res: Response): Promise<void> {
+    const {bytes, mediaType} = await this.applications.getImage(id, label);
+    res.setHeader("Content-Type", mediaType);
+    res.send(Buffer.from(bytes));
   }
 
   /** Change an application's details and re-run the check. */

@@ -55,6 +55,18 @@ services:
       # name instead of the file's localhost default.
       NODE_ENV: local
       DB_HOST: postgres
+      # Point the Google client library at the mounted credentials below, so the
+      # reader's key can be fetched from Secret Manager from inside the container.
+      # LOCAL ONLY: in production (Cloud Run/GKE/GCE) no file is used — the
+      # attached service account is discovered automatically via the metadata
+      # server, which is why the app code passes no credentials.
+      GOOGLE_APPLICATION_CREDENTIALS: /gcloud/application_default_credentials.json
+    volumes:
+      # Share your local gcloud Application Default Credentials into the container
+      # read-only, so Secret Manager works the same as `npm run start`. Created by
+      # `gcloud auth application-default login`. Never baked into the image or
+      # shipped to production.
+      - ${HOME}/.config/gcloud/application_default_credentials.json:/gcloud/application_default_credentials.json:ro
     ports:
       - '3000:3000'
 

@@ -1,18 +1,17 @@
+import {resolveReaderApiKey} from "../secrets/secret-manager";
+
 /**
- * Production config source: GCP Secret Manager.
+ * Production config source.
  *
- * STUB — clearly marked. The real implementation will pull settings from
- * Google Secret Manager (via `@google-cloud/secret-manager`). What's left to
- * decide (and out of scope for Phase 1) is the exact wiring: the client
- * library setup, and how the individual secrets are named and grouped.
- *
- * Until that lands, production values are read from the process environment so
- * the source is swappable and the startup validation path is still exercised.
- * The point of this phase is that the wiring seam exists — the same swappable
- * idea as the label reader — not that production is finished.
+ * PARTIAL STUB — non-secret settings are still read from the process
+ * environment here (the swappable seam; grouping them into a real Secret
+ * Manager fetch is out of scope for now). The reader's API key, however, is
+ * already fetched from Secret Manager via the non-sensitive `anthropicKeySecret`
+ * pointer — never from the environment — so an ambient `ANTHROPIC_API_KEY`
+ * can never be picked up. The same fetch is used locally.
  */
-export function loadGcpConfig(): unknown {
-  // TODO(phase-later): replace with a real Secret Manager fetch.
+export async function loadGcpConfig(): Promise<unknown> {
+  // TODO(phase-later): read the non-secret settings from Secret Manager too.
   return {
     env: "production",
     port: process.env.PORT ? Number(process.env.PORT) : undefined,
@@ -24,16 +23,20 @@ export function loadGcpConfig(): unknown {
       user: process.env.DB_USER,
       password: process.env.DB_PASSWORD
     },
-    reader: {
+    reader: await resolveReaderApiKey({
       provider: "anthropic",
       model: process.env.READER_MODEL ?? "claude-haiku-4-5",
-      apiKey: process.env.ANTHROPIC_API_KEY,
+      apiKey: "",
+      anthropicKeySecret: process.env.ANTHROPIC_KEY_SECRET ?? "",
       timeoutMs: process.env.READER_TIMEOUT_MS ? Number(process.env.READER_TIMEOUT_MS) : 5000
-    },
+    }),
     storage: {
       imageStore: "gcs",
       dir: "",
       bucket: process.env.GCS_BUCKET
+    },
+    cors: {
+      origins: process.env.CORS_ORIGINS ? process.env.CORS_ORIGINS.split(",") : []
     }
   };
 }

@@ -22,10 +22,16 @@ export class ClaudeLabelReader implements LabelReader {
   constructor(
     private readonly languageModel: LanguageModel,
     private readonly timeoutMs: number,
-    readonly model: string = ""
+    readonly model: string = "",
+    private readonly hasApiKey: boolean = true
   ) {}
 
   async read(image: LabelImage, type: DrinkType, lookFor: ThingsToLookFor): Promise<LabelReadingReport> {
+    // Fail clearly rather than sending a blank key (which reads as a confusing
+    // 401). The app boots without a key; this is where its absence surfaces.
+    if (!this.hasApiKey) {
+      throw new ReaderError(`reading label "${image.label}" failed: no Anthropic API key is configured (set the reader's anthropicKeySecret and grant access to that secret)`);
+    }
     try {
       const {bytes, mediaType} = loadImage(image);
       const {object} = await generateObject({
@@ -64,8 +70,11 @@ export interface ClaudeReaderConfig {
 }
 
 export function createClaudeReader(config: ClaudeReaderConfig): ClaudeLabelReader {
+  // Always pass a string (never undefined) so the AI SDK cannot fall back to a
+  // stray ANTHROPIC_API_KEY in the environment. An empty key is caught at read
+  // time by the reader's own guard.
   const anthropic = createAnthropic({apiKey: config.apiKey});
-  return new ClaudeLabelReader(anthropic(config.model), config.timeoutMs, config.model);
+  return new ClaudeLabelReader(anthropic(config.model), config.timeoutMs, config.model, config.apiKey !== "");
 }
 
 /** A reader failure — a clear error, not a hang or a wrong answer. */

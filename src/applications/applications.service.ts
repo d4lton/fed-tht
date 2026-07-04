@@ -1,8 +1,8 @@
-import {Inject, Injectable} from "@nestjs/common";
+import {Inject, Injectable, NotFoundException} from "@nestjs/common";
 import {CheckService} from "../checks/check.service";
 import {Application, ImageRef} from "../storage/application.entity";
 import {ApplicationStore} from "../storage/application.store";
-import {IMAGE_STORE, ImageStore} from "../storage/image-store/image-store";
+import {IMAGE_STORE, ImageStore, StoredImage} from "../storage/image-store/image-store";
 import {CreateApplicationDto, UpdateDetailsDto, UpdateImagesDto} from "./application.dto";
 import {ApplicationSummary, ApplicationView, toSummary, toView} from "./application-view";
 
@@ -42,6 +42,16 @@ export class ApplicationsService {
 
   async get(id: string): Promise<ApplicationView> {
     return toView(await this.store.load(id));
+  }
+
+  /** Fetch one label image's bytes, so the detail screen can show it. */
+  async getImage(id: string, label: string): Promise<StoredImage> {
+    const record = await this.store.load(id);
+    const image = record.images.find((entry) => entry.label === label);
+    if (!image) {
+      throw new NotFoundException(`application "${id}" has no image labelled "${label}"`);
+    }
+    return this.imageStore.load(image.ref);
   }
 
   async updateDetails(id: string, dto: UpdateDetailsDto): Promise<ApplicationView> {
