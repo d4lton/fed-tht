@@ -2,3 +2,8 @@ node_modules
 dist
 *.local
 .firebase
+
+# Environment files — may hold secrets. Only .env.example is committed.
+.env
+.env.*
+!.env.example

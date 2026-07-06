@@ -13,6 +13,12 @@
 /scripts/deploy.*.env
 !/scripts/deploy.*.env.example
 
+# Environment files anywhere — may hold secrets. Only *.env.example is committed.
+.env
+.env.*
+!.env.example
+!*.env.example
+
 # Terraform: local state, provider plugins, and filled-in vars (may hold secrets).
 /terraform/.terraform
 /terraform/.terraform.lock.hcl
