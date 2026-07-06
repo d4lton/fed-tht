@@ -71,6 +71,9 @@ mode), TypeORM + Postgres for storage, Vercel's AI SDK for the label reader.
   stops everything, `db:reset` also deletes the data volume, `db:logs` tails it).
 - Database schema: `npm run migration:run` applies the TypeORM migrations
   (`migration:revert` rolls the last one back).
+- Deploy: `npm run deploy:production` ships the backend to Cloud Run, migrates
+  the managed database, and publishes the frontend to Firebase Hosting. The
+  one-time GCP setup and the full runbook are in `DEPLOY.md`.
 
 The runtime-config source is selected by `NODE_ENV`: `local` (default) reads
 `config/config.local.json`, `test` reads `config/config.test.json`, `production`

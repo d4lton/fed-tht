@@ -5,6 +5,7 @@ import {CheckRun} from "../checks/check-run.entity";
 import {Application} from "./application.entity";
 import {CreateApplications1730000000000} from "./migrations/1730000000000-create-applications";
 import {CreateCheckRuns1730000001000} from "./migrations/1730000001000-create-check-runs";
+import {AddCheckRunAssisted1730000002000} from "./migrations/1730000002000-add-check-run-assisted";
 
 /**
  * The TypeORM DataSource for the migration CLI (`npm run migration:run`). It
@@ -22,5 +23,5 @@ export default loadConfiguration().then(({app}) => new DataSource({
   username: app.database.user,
   password: app.database.password,
   entities: [Application, CheckRun],
-  migrations: [CreateApplications1730000000000, CreateCheckRuns1730000001000]
+  migrations: [CreateApplications1730000000000, CreateCheckRuns1730000001000, AddCheckRunAssisted1730000002000]
 }));

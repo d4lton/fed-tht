@@ -28,7 +28,8 @@ export interface CheckInput {
  * Runs and times a check, and records it. This is the outer layer around the
  * pure pipeline (read → combine → judge): it resolves the image references to
  * bytes through the storage swap point, runs the flow, stamps the run facts
- * (when, how long, which model), and appends one entry to the log. The core
+ * (when, how long, which model, whether the model fallback assisted), and
+ * appends one entry to the log. The core
  * still knows nothing of timing, models, or storage.
  */
 @Injectable()
@@ -72,7 +73,8 @@ export class CheckService {
       reasons: verdict.reasons,
       ranAt: new Date().toISOString(),
       tookMs,
-      model: this.reader.model
+      model: this.reader.model,
+      assisted: verdict.assisted
     };
     await this.log.append(result);
     return result;

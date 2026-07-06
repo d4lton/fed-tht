@@ -17,6 +17,8 @@ export interface CheckResult {
   ranAt: string;
   tookMs: number;
   model: string;
+  /** Whether the model fallback assisted the OCR pass (drives "OCR" vs "OCR + Model"). */
+  assisted: boolean;
 }
 
 export interface ImageRef {

@@ -30,6 +30,10 @@ export class CheckRun {
   @Column({type: "varchar"})
     model!: string;
 
+  /** Whether the model fallback was consulted (explains the slower runs). */
+  @Column({type: "boolean", default: false})
+    assisted!: boolean;
+
   @CreateDateColumn()
     createdAt!: Date;
 

@@ -9,6 +9,18 @@
 # Local image storage (disk image store)
 /var
 
+# Filled-in deploy config (per environment); the .example templates are committed.
+/scripts/deploy.*.env
+!/scripts/deploy.*.env.example
+
+# Terraform: local state, provider plugins, and filled-in vars (may hold secrets).
+/terraform/.terraform
+/terraform/.terraform.lock.hcl
+/terraform/*.tfstate
+/terraform/*.tfstate.*
+/terraform/terraform.tfvars
+/terraform/*.auto.tfvars
+
 # Logs
 *.log
 npm-debug.log*

@@ -1,0 +1,19 @@
+# Copy to terraform.tfvars (gitignored) and fill in. Or pass -var / TF_VAR_*.
+# db_password is sensitive — prefer `export TF_VAR_db_password=...` over a file.
+
+project_id      = "fed-tht"
+region          = "us-central1"
+zone            = "us-central1-a"
+
+# Globally-unique bucket name (pick your own).
+images_bucket   = "fed-tht-images"
+
+# The frontend origin the backend accepts (Firebase Hosting address).
+cors_origin     = "https://fed-tht.web.app"
+
+# Who runs deploys — granted IAP tunnel access for the migration step.
+deployer_member = "user:you@example.com"
+
+# The Postgres password. Better set via env: export TF_VAR_db_password='...'
+# (avoid single quotes in the value). Stored in Secret Manager and TF state.
+# db_password   = "..."

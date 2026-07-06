@@ -21,7 +21,8 @@ export class ChecksLogStore {
       outcome: result.outcome,
       ranAt: result.ranAt,
       tookMs: result.tookMs,
-      model: result.model
+      model: result.model,
+      assisted: result.assisted
     });
     await this.repo.save(entry);
   }

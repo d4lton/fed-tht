@@ -23,7 +23,7 @@ export function ResultView({
         description={
           <Typography.Text type="secondary">
             Checked {new Date(result.ranAt).toLocaleString()} · took{" "}
-            {result.tookMs} ms · read by {result.model}
+            {result.tookMs} ms · {result.assisted ? "OCR + Model" : "OCR"}
           </Typography.Text>
         }
       />

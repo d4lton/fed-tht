@@ -24,7 +24,10 @@ export async function loadGcpConfig(): Promise<unknown> {
       password: process.env.DB_PASSWORD
     },
     reader: await resolveReaderApiKey({
-      provider: "anthropic",
+      // Default to the fast OCR reader (the hard latency budget rules out the
+      // model reader as the default — see decisions/reader-provider-and-latency).
+      // The Anthropic key still resolves for the deterministic-first fallback.
+      provider: process.env.READER_PROVIDER === "anthropic" ? "anthropic" : "google-vision",
       model: process.env.READER_MODEL ?? "claude-haiku-4-5",
       apiKey: "",
       anthropicKeySecret: process.env.ANTHROPIC_KEY_SECRET ?? "",

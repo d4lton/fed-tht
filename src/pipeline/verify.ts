@@ -38,7 +38,17 @@ export interface VerifyInput {
   budgetMs?: number;
 }
 
-export async function verifyLabels(input: VerifyInput): Promise<ValidationResult> {
+/**
+ * The pure verdict plus one run-fact the display needs: whether the model
+ * fallback was consulted. `assisted` is true only when the deterministic-first
+ * fallback actually rescued a field (a model was in the loop). The pure core
+ * still returns only the verdict — this flag is added at the pipeline boundary.
+ */
+export interface VerifyResult extends ValidationResult {
+  assisted: boolean;
+}
+
+export async function verifyLabels(input: VerifyInput): Promise<VerifyResult> {
   const started = Date.now();
   const lookFor = thingsToLookFor(input.expected, input.rules);
   // Extraction is per-image and independent, so the reads can run in parallel.
@@ -50,7 +60,7 @@ export async function verifyLabels(input: VerifyInput): Promise<ValidationResult
     application: input.application
   });
   if (result.outcome === "pass" || !input.fallback) {
-    return result;
+    return {...result, assisted: false};
   }
   return rescue(result, reports, lookFor, input, Date.now() - started);
 }
@@ -69,14 +79,14 @@ async function rescue(
   lookFor: ThingsToLookFor,
   input: VerifyInput,
   elapsedMs: number
-): Promise<ValidationResult> {
+): Promise<VerifyResult> {
   const fallback = input.fallback;
   const deadlineMs = (input.budgetMs ?? Infinity) - elapsedMs;
   const missing = fieldsWithReason(result, input.rules, (reasons) => reasons.missing);
   const unreadable = fieldsWithReason(result, input.rules, (reasons) => reasons.unreadable);
   // No hard fields to chase, or no time left to chase them.
   if (!fallback || (missing.length === 0 && unreadable.length === 0) || deadlineMs < 800) {
-    return result;
+    return {...result, assisted: false};
   }
 
   // The two moves are independent, so run them at once — total time is the
@@ -92,7 +102,7 @@ async function rescue(
   ]);
   const rescued = [...rechecked, ...reread];
   if (rescued.length === 0) {
-    return result;
+    return {...result, assisted: false};
   }
 
   // Replace the fast pass's read of each rescued field so the re-read supersedes
@@ -102,12 +112,13 @@ async function rescue(
     ...report,
     fields: report.fields.filter((read) => !rescuedFields.has(read.field))
   }));
-  return judge({
+  const rejudged = judge({
     aggregated: aggregate([...trimmed, {label: "fallback", fields: rescued}]),
     expected: input.expected,
     rules: input.rules,
     application: input.application
   });
+  return {...rejudged, assisted: true};
 }
 
 /** Required fields whose named reason (missing / unreadable) the fast pass emitted. */

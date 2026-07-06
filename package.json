@@ -21,11 +21,13 @@
     "app:down": "docker compose down",
     "app:logs": "docker compose logs -f app",
     "migration:run": "typeorm-ts-node-commonjs migration:run -d src/storage/data-source.ts",
-    "migration:revert": "typeorm-ts-node-commonjs migration:revert -d src/storage/data-source.ts"
+    "migration:revert": "typeorm-ts-node-commonjs migration:revert -d src/storage/data-source.ts",
+    "deploy:production": "bash scripts/deploy.sh production"
   },
   "dependencies": {
     "@ai-sdk/anthropic": "^3.0.92",
     "@google-cloud/secret-manager": "^6.2.0",
+    "@google-cloud/storage": "^7.21.0",
     "@google-cloud/vision": "^5.3.7",
     "@nestjs/common": "^11.0.0",
     "@nestjs/config": "^4.0.0",

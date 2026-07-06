@@ -214,12 +214,15 @@ describe("verifyLabels — deterministic-first LLM fallback", () => {
   it("without a fallback, a field the fast pass missed simply fails", async () => {
     const result = await verifyLabels({images: IMAGES, type: TYPE, expected: EXPECTED, rules: RULES, reader: new StandInReader(missedNetContents())});
     expect(result.reasons.map((reason) => reason.id)).toContain("net-contents-missing");
+    expect(result.assisted).toBe(false);
   });
 
   it("rechecks the text to rescue a required field the fast pass missed, and passes", async () => {
     const fallback = new FakeFallback([{field: "net-contents", state: "found", text: "One pint nine ounces", basis: "confirmed"}]);
     const result = await runWith(new StandInReader(missedNetContents()), fallback);
     expect(result.outcome).toBe("pass");
+    // A model rescued the field, so the run is marked model-assisted.
+    expect(result.assisted).toBe(true);
     // Only the missing field was handed off; the OCR text went with it.
     expect(fallback.lastRecheck?.fields).toEqual(["net-contents"]);
     expect(fallback.lastRecheck?.text).toContain("ONE PINT NINE OUNCES");
@@ -233,6 +236,7 @@ describe("verifyLabels — deterministic-first LLM fallback", () => {
     const fallback = new FakeFallback([], [{field: "warning", state: "found", text: GOVERNMENT_WARNING_TEXT, basis: "confirmed"}]);
     const result = await runWith(new StandInReader(mangledWarning()), fallback);
     expect(result.outcome).toBe("pass");
+    expect(result.assisted).toBe(true);
     expect(fallback.lastReread?.fields).toEqual(["warning"]);
   });
 
@@ -240,12 +244,15 @@ describe("verifyLabels — deterministic-first LLM fallback", () => {
     const result = await runWith(new StandInReader(missedNetContents()), new FakeFallback());
     expect(result.outcome).toBe("fail");
     expect(result.reasons.map((reason) => reason.id)).toContain("net-contents-missing");
+    // The fallback rescued nothing, so the run is not marked model-assisted.
+    expect(result.assisted).toBe(false);
   });
 
   it("does not consult the fallback when the fast pass already passes", async () => {
     const fallback = new FakeFallback();
     const result = await runWith(new StandInReader(cleanBourbon()), fallback);
     expect(result.outcome).toBe("pass");
+    expect(result.assisted).toBe(false);
     expect(fallback.lastRecheck).toBeUndefined();
     expect(fallback.lastReread).toBeUndefined();
   });

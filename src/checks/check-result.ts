@@ -17,4 +17,11 @@ export interface CheckResult {
   tookMs: number;
   /** Which model/reader read the images. */
   model: string;
+  /**
+   * Whether the model fallback was consulted to rescue a field the fast OCR
+   * pass couldn't. False for a plain OCR run; true when a model was in the loop
+   * (and the reason the run took longer). The UI turns this into "OCR" vs
+   * "OCR + Model" without exposing the reader or model names.
+   */
+  assisted: boolean;
 }

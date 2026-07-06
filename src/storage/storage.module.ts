@@ -7,6 +7,7 @@ import {ApplicationStore} from "./application.store";
 import {ApplicationLoader} from "./application-loader";
 import {CreateApplications1730000000000} from "./migrations/1730000000000-create-applications";
 import {CreateCheckRuns1730000001000} from "./migrations/1730000001000-create-check-runs";
+import {AddCheckRunAssisted1730000002000} from "./migrations/1730000002000-add-check-run-assisted";
 import {DiskImageStore} from "./image-store/disk.image-store";
 import {GcsImageStore} from "./image-store/gcs.image-store";
 import {IMAGE_STORE, ImageStore} from "./image-store/image-store";
@@ -45,8 +46,13 @@ const ENTITIES = [Application, CheckRun];
           username: db.user,
           password: db.password,
           entities: ENTITIES,
-          migrations: [CreateApplications1730000000000, CreateCheckRuns1730000001000],
-          migrationsRun: true,
+          migrations: [CreateApplications1730000000000, CreateCheckRuns1730000001000, AddCheckRunAssisted1730000002000],
+          // Local dev is a single instance, so run migrations on boot for
+          // convenience. Production may run several instances at once, which would
+          // race on start-up migrations — there the deploy command moves the
+          // schema forward once (before the new version takes traffic) and the app
+          // boots against an already-current schema. See scripts/deploy.sh.
+          migrationsRun: config.env !== "production",
           synchronize: false
         };
       }
